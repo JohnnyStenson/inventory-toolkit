@@ -34,6 +34,7 @@ require_once 'functions.php';
 
     </script>
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
     <div id="menu">
       <?php show_all_locations($mySforceConnection); ?>
     </div>  
@@ -46,5 +47,7 @@ require_once 'functions.php';
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
     <script src="functions.js"></script>
+    <script type="text/javascript" src="hilitor.js"></script>
+    
 </body>
 </html>
