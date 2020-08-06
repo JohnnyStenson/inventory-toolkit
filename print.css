@@ -1,0 +1,35 @@
+.inv_button{
+    display:none;
+}
+.inv_record{
+    border-bottom: 2px solid black;
+    margin-bottom:20px;
+}
+.inv_record, img, svg {
+    break-inside: avoid;
+}
+.inv_name{
+    width:45%;
+    display:inline-block;
+    font-size:20pt;
+    padding-bottom: 10px;;
+}
+.inv_barcode{
+    width:30%;
+    text-align:left;
+    display:inline-block;
+}
+.inv_barcode img{
+    max-width: 90%;
+}
+.inv_image_container{
+    width:20%;
+    text-align:center;
+    display:inline-block;
+}
+.inv_image{
+    height: 100px;
+}
+body{
+    
+}

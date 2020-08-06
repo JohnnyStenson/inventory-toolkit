@@ -27,17 +27,17 @@ Debugger::$showLocation = true;
 Debugger::$maxLength = 256;
 Debugger::$maxDepth = 4;
 
+defined("SITE_PW") or define("SITE_PW", getenv('SITE_PW'));
 defined("USERNAME") or define("USERNAME", getenv('USERNAME'));
 defined("SECURITY_TOKEN") or define("SECURITY_TOKEN", getenv('SECURITY_TOKEN'));
 defined("PASSWORD") or define("PASSWORD", getenv('PASSWORD'));
-require_once ('soapclient/SforceEnterpriseClient.php');
+require_once ('soapclient/SforcePartnerClient.php');
 
-$mySforceConnection = new SforceEnterpriseClient();
-8
-$mySforceConnection->createConnection("enterprise.wsdl.xml");
-9
+$mySforceConnection = new SforcePartnerClient();
+$mySforceConnection->createConnection("/home/thunde91/lightning.thunderroadinc.com/inventory/soapclient/partner.wsdl.xml");
 $mySforceConnection->login(USERNAME, PASSWORD.SECURITY_TOKEN);
 
+use Intervention\Image\ImageManager;
 
 /*defined("CLIENT_ID") or define("CLIENT_ID", getenv('CLIENT_ID'));
 

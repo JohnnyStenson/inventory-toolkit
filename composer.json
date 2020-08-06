@@ -3,6 +3,7 @@
         "nette/robot-loader": "^3.0",
         "vlucas/phpdotenv": "^3.4",
         "tracy/tracy": "^2.5",
+        "intervention/image": "^2.5",
         "bigfish/pdf417": "^0.3.0"
     },
     "autoload": {

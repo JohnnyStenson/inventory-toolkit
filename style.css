@@ -1,0 +1,83 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+}
+.btnLogin{
+    border-radius:10px;
+    text-decoration: none;
+    border: 5px solid blue;
+    padding: 20px;
+    margin:10px;
+    display:block;
+    font-size:36px;
+    font-weight: bold;
+    text-align:center;
+    color:blue;
+}
+
+.inv_record{
+    display:flex;
+    align-items:center;
+    padding:10px;
+    margin:10px;
+    border:1px solid black;
+    font-size:min(2vmin,16px);
+}
+
+.inv_name{
+    padding-right:10px;
+    font-size:20px;
+    width:50%;
+}
+.inv_image_container{
+    width:20%;
+}
+.inv_image{
+    height: 100px;
+    padding-right:10px;
+}
+.inv_barcode{
+    display:none;
+}
+.inv_button{
+    border-radius:10px;
+    text-decoration: none;
+    border: 1px solid blue;
+    padding: 20px;
+    margin:10px;
+    display:block;
+    font-size:30px;
+    text-align:center;
+}
+.btnLocation, #btnShowLocationButtons{
+    border-radius:10px;
+    text-decoration: none;
+    border: 1px solid blue;
+    padding: 20px;
+    margin:10px;
+    display:block;
+    font-size:30px;
+    text-align:center;
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 800px) {
+    .inv_record{
+        display:block;
+        text-align:center;
+        width:100%;
+    }
+    .inv_name{
+        padding-right:10px;
+        font-size:30px;
+        width:100%;
+    }
+    .inv_image{
+        height: 300px !important;
+        width: auto !important;
+        margin:10px auto;
+        display:block;
+    }
+    .inv_image_container{
+        width:100%;
+    }
+}
