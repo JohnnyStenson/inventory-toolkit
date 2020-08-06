@@ -59,7 +59,7 @@ function display_inventory($response, $location){
             echo "<div class='inv_image_container'><img class='inv_image' src='" . $sObject2->fields->Image_for_ListView__c . "' /></div>";
         }
         
-
+/*
         if('all' == $location){
             echo "<div class='inv_quantity'> Current #: " . $sObject->fields->TrackIT__Total_Quantity__c . "</div>";
         }else{
@@ -71,6 +71,7 @@ function display_inventory($response, $location){
                 </div>
             </div>";
         }
+    */
         /*
         SObject Object ( 
             [type] => TrackIT__Inv_Location__c 
