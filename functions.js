@@ -1,4 +1,4 @@
-$('.tag').on('click', function(e) {
+/*$('.tag').on('click', function(e) {
     e.preventDefault();
     var tagId = $(this).data('id');
     $.ajax({
@@ -11,6 +11,15 @@ $('.tag').on('click', function(e) {
        }
    });
     alert(tagId);
+});*/
+
+/* Consume Inventory */
+$('.consumeInventory').on('click', function(e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    var name = $(this).data('location');
+    alert(id);
+    alert(name);
 });
 
 /* Location Buttons */
