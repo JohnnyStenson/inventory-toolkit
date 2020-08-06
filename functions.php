@@ -3,6 +3,22 @@ use BigFish\PDF417\PDF417;
 use BigFish\PDF417\Renderers\ImageRenderer;
 use BigFish\PDF417\Renderers\SvgRenderer;
 
+function deduct_inv_from_location($mySforceConnection, $inv_id, $location_id, $job_id, $quant){
+    $records = array();
+
+    $records[0] = new SObject();
+	$records[0]->fields = array(
+        'Inventory__c' => $inv_id,
+        'Location__c' => $location_id,
+        'Job__c' => $job_id,
+        'Quantity_Used__c' => $quant
+    );
+    $records[0]->type = 'Job_Inventory_Consumption__c';
+
+    $response = $mySforceConnection->create($records);
+
+}
+
 /* Menu Buttons */
 function show_all_locations($mySforceConnection){
     echo "<a class='btnLocation' data-id='all' data-name='All Inventory' href='#'>View All</a>";
@@ -12,7 +28,7 @@ function show_all_locations($mySforceConnection){
 
     foreach ($response as $record) {
         $sObject = new SObject($record);
-        echo "<a class='btnLocation' data-id='" . $sObject->Id . "' data-name='" . $sObject->fields->Name . "' href='#' >". $record->fields->Name ."</a>";
+        echo "<a class='btnLocation' data-id='" . $sObject->Id . "' data-name='" . $sObject->fields->Name . "' href='#' >". $sObject->fields->Name ."</a>";
     }
 }
 
@@ -32,12 +48,28 @@ function query_inv_by_location($mySforceConnection, $id){
     
     $response = $mySforceConnection->query($query);
 
-    display_inventory($response, $location);
+    display_inventory($mySforceConnection, $response, $location);
+}
+function get_job_list($mySforceConnection){
+    $query = "SELECT Id, Name from Job__c ORDER BY Name ASC";
+    $response = $mySforceConnection->query($query);
+    $arrayJobs = [];
+    foreach ($response as $record) {
+        $sObject = new SObject($record);
+        $arrayJobs[$sObject->Id] = $sObject->fields->Name;
+    }
+    return $arrayJobs;
 }
 
-
 /* Main Display Inventory */
-function display_inventory($response, $location){
+function display_inventory($mySforceConnection, $response, $location){
+    if('all' !== $location){
+        $arrayJobs = get_job_list($mySforceConnection);
+        $ploJobs = '';
+        foreach($arrayJobs as $jobId => $jobName){
+            $ploJobs .= "<option value='" . $jobId . "'>" . $jobName . "</option>";
+        }
+    }
 
     foreach ($response as $record) {
         $sObject = new SObject($record);
@@ -59,19 +91,22 @@ function display_inventory($response, $location){
             echo "<div class='inv_image_container'><img class='inv_image' src='" . $sObject2->fields->Image_for_ListView__c . "' /></div>";
         }
         
-/*
+
         if('all' == $location){
             echo "<div class='inv_quantity'> Current #: " . $sObject->fields->TrackIT__Total_Quantity__c . "</div>";
         }else{
             echo "
             <div class='inv_quantity'> <span style='font-size:20px; font-weight:bold;'>Current #: " . $sObject->fields->TrackIT__Quantity__c . "</span><br />
                 <div class='used' data-id='" . $sObject2->Id . "'>
-                    <input type='text' class='consumeQuant' style='font-size:20px; padding:10px; margin-bottom:20px; display:block;' data-id='" . $sObject2->Id . "' placeholder='USED'/>
-                    <a href='#' class='consumeInventory' data-id='" . $sObject2->Id . "' data-location='" . $location . "' style='font-size:30px; padding:20px; border:1px solid blue; color:blue; text-decoration:none; margin-top:20px; display:block; text-align:center;'>Deduct</a>
+                    <input type='text' class='consumeQuant' style='font-size:20px; padding:10px; margin-bottom:20px; display:block;' data-id='" . $sObject2->Id . "' placeholder='# USED'/>
+                    
+                    <select class='consumeJob' data-id='" . $sObject2->Id . "' data-location='" . $location . "' data-current='" . $sObject->fields->TrackIT__Quantity__c . "'  style='display:none;' ><option value='0'>Choose Job Used on to Deduct from Inventory:</option>" .
+                    $ploJobs .
+                    "</select>
                 </div>
             </div>";
         }
-    */
+    
         /*
         SObject Object ( 
             [type] => TrackIT__Inv_Location__c 
@@ -110,11 +145,11 @@ function display_inventory($response, $location){
             <button type="submit" class="btn btn-primary" name="btnSubmit" style="font-size:30px; padding:20px; margin:20px;">SUBMIT</button>			
         </form>
 <?php
-        if('all' == $location){
+        /*if('all' == $location){
             echo "<a class='inv_button' href='salesforce1://sObject/" . $sObject->Id . "/view'>OPEN in <br />Salesforce App</a>";
         }else{
             echo "<a class='inv_button' href='salesforce1://sObject/" . $sObject2->Id . "/view'>OPEN in <br />Salesforce App</a>"; 
-        }
+        }*/
         
         echo "</div>";
     }
