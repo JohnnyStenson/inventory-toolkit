@@ -18,6 +18,9 @@ require_once 'functions.php';
 </head>
 
 <body>
+    <div id="loading_overlay"></div>
+    <div id="msg"></div>
+
     <div id="google_translate_element"></div>
     <script>
 

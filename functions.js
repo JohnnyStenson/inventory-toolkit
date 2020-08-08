@@ -28,6 +28,7 @@ $('#display').delegate('.changeDescription', 'click', function(e) {
 });
 $('#display').delegate('.btn_changeDescription', 'click', function(e) {
     e.preventDefault();
+    $('#loading_overlay').css('display','block');
     var id = $(this).data('id');
     var location = $(this).data('location');
     var descr = $('.changeDescription[data-id="' + id + '"]').val();
@@ -58,6 +59,7 @@ $('#display').delegate('.btn_changeDescription', 'click', function(e) {
                     $('#menu').css('display','none');
                     $('#menuHidden').css('display','block');
                     document.getElementById("locationName").innerHTML =name;
+                    $('#loading_overlay').css('display','none');
                }
            });
        }
@@ -73,6 +75,7 @@ $('#display').delegate('.changeQuant', 'click', function(e) {
 });
 $('#display').delegate('.btn_changeQuant', 'click', function(e) {
     e.preventDefault();
+    $('#loading_overlay').css('display','block');
     var id = $(this).data('id');
     var location = $(this).data('location');
     var quant = $('.changeQuant[data-id="' + id + '"]').val();
@@ -104,6 +107,7 @@ $('#display').delegate('.btn_changeQuant', 'click', function(e) {
                     $('#menu').css('display','none');
                     $('#menuHidden').css('display','block');
                     document.getElementById("locationName").innerHTML =name;
+                    $('#loading_overlay').css('display','none');
                }
            });
        }
@@ -119,6 +123,7 @@ $('#display').delegate('.consumeQuant', 'click', function(e) {
 
 });
 $('#display').delegate('.consumeJob', 'change', function(e) {
+
     var id = $(this).data('id');
     var location = $(this).data('location');
     var quant = $('.consumeQuant[data-id="' + id + '"]').val();
@@ -129,7 +134,7 @@ $('#display').delegate('.consumeJob', 'change', function(e) {
         alert('Deducting too many or none. Refresh page and try again. / Deduzindo muitos ou nenhum. Atualize a página e tente novamente.');
         return;
     }
-    
+    $('#loading_overlay').css('display','block');
     $.ajax({
         type: "POST",
         url: 'inv-controller.php',
@@ -158,6 +163,7 @@ $('#display').delegate('.consumeJob', 'change', function(e) {
                     $('#menu').css('display','none');
                     $('#menuHidden').css('display','block');
                     document.getElementById("locationName").innerHTML =name;
+                    $('#loading_overlay').css('display','none');
                }
            });
        }
@@ -168,6 +174,7 @@ $('#display').delegate('.consumeJob', 'change', function(e) {
 /* Location Buttons */
 $('.btnLocation').on('click', function(e) {
     e.preventDefault();
+    $('#loading_overlay').css('display','block');
     var id = $(this).data('id');
     var name = $(this).data('name');
     $.ajax({
@@ -186,6 +193,7 @@ $('.btnLocation').on('click', function(e) {
             $('#menu').css('display','none');
             $('#menuHidden').css('display','block');
             document.getElementById("locationName").innerHTML =name;
+            $('#loading_overlay').css('display','none');
        }
    });
 });

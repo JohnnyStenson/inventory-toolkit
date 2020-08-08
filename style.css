@@ -4,6 +4,24 @@ body{
 input[type='text']{
     border:1px black solid;
 }
+#loading_overlay{
+
+	top: 0;
+
+	left: 0;
+
+	position: fixed;
+
+	width: 100%;
+
+	height: 100%;
+
+	background: url('../images/ajax-loader.gif') center center no-repeat;
+
+	display:none;
+
+}
+
 #btnLogin{
     text-align:center; 
     width:90vw; 
