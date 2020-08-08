@@ -1,17 +1,23 @@
-/*$('.tag').on('click', function(e) {
+/* Login */
+/* Change Description */
+$('body').delegate('#btnLogin', 'click', function(e) {
     e.preventDefault();
-    var tagId = $(this).data('id');
+    $('#loading_overlay').css('display','block');
+    var pw = $('#pw').val();
     $.ajax({
         type: "POST",
-        url: 'display-tagged-inventory.php',
-        data: {id: tagId},
+        url: 'login.php',
+        data: {
+            pw: pw,
+        },
         success: function(response)
         {
-            document.getElementById("display").innerHTML =response;
-       }
+            location.reload();
+        }
    });
-    alert(tagId);
-});*/
+});
+
+
 /* Admin Drawer */
 $('#display').delegate('.openAdminDrawer', 'click', function(e) {
     e.preventDefault();

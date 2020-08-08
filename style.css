@@ -201,7 +201,6 @@ input[type='text']{
     .consumeQuant, .consumeJob, .changeQuant, .changeDescription{
         width:200px;
         box-sizing:border-box;
-        webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
     }
     .btnOpenDrawer{

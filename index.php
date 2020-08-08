@@ -1,9 +1,4 @@
-<?php
-if(!isset($_SESSION)) session_start(); 
-require 'site-auth.php';
-require_once 'functions.php';
-?>
-
+<?php if(!isset($_SESSION)) session_start(); ?>
 <!DOCTYPE html>
 
 <html lang="en">
@@ -36,9 +31,9 @@ require_once 'functions.php';
 
     </script>
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    
+    <?php require 'site-auth.php'; ?>
     <div id="menu">
-      <?php show_all_locations($mySforceConnection); ?>
+      <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
     </div>  
     <div id="menuHidden" style="display:none;">
       <a id='btnShowLocationButtons' href='#'>Change Location</a>
