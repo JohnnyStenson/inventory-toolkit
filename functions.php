@@ -3,6 +3,20 @@ use BigFish\PDF417\PDF417;
 use BigFish\PDF417\Renderers\ImageRenderer;
 use BigFish\PDF417\Renderers\SvgRenderer;
 
+
+/* Change Description of Inventory */
+function change_descrption_of_inventory($mySforceConnection, $id, $descr){
+    $records[0] = new SObject();
+	$records[0]->Id = $id;
+	$records[0]->fields = array(
+    	'TrackIT__Description__c' => $descr,
+	);
+	$records[0]->type = 'TrackIT__Inventory__c';
+
+	$response = $mySforceConnection->update($records);
+}
+
+
 function change_quantity_location_of_inventory($mySforceConnection, $inv_id, $location_id, $quant ){
     // get TrackIT__Inv_Location__c.Id 
     $query = "SELECT Id FROM TrackIT__Inv_Location__c WHERE TrackIT__Inventory__c='" . $inv_id . "' AND TrackIT__Location__c='" . $location_id . "'";
@@ -52,6 +66,7 @@ function show_all_locations($mySforceConnection){
     }
 }
 
+
 /* Query Inv by Location */
 function query_inv_by_location($mySforceConnection, $id){
     if($id == 'all'){
@@ -70,6 +85,7 @@ function query_inv_by_location($mySforceConnection, $id){
 
     display_inventory($mySforceConnection, $response, $location);
 }
+
 function get_job_list($mySforceConnection){
     $query = "SELECT Id, Name from Job__c ORDER BY Name ASC";
     $response = $mySforceConnection->query($query);
@@ -152,9 +168,52 @@ function display_inventory($mySforceConnection, $response, $location){
             <a href='#' class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</a>
         </div>
         <div class='admin_drawer' data-id='<?php echo $$sf->Id; ?>'>
+            
+            <!-- BEGIN Change description -->
+            <input type='text' 
+                class='changeDescription' 
+                data-id='<?php echo $$sf->Id; ?>' 
+                placeholder='Change Description'
+            />
+            <a href='#' 
+                class='btn_changeDescription'
+                style='display:none;' 
+                data-id='<?php echo $$sf->Id; ?>'
+                data-location='<?php echo $location; ?>' >
+                Change Description
+            </a>
+            <!-- END Change description -->
 
+<?php
+    if('all' != $location){ // BEGIN allow quant change
+?>
+            <input type='text' 
+                class='changeQuant' 
+                data-id='<?php echo $$sf->Id; ?>' placeholder='Change Quantity'
+            />
+            <a href='#' 
+                class='btn_changeQuant'
+                style='display:none;' 
+                data-id='<?php echo $$sf->Id; ?>' 
+                data-location='<?php echo $location; ?>'>
+                Change Quantity
+            </a>
+<?php
+    } // END allow quant change
 
+    if('all' == $location){ // BEGIN assign to a location
+?>
+            <a href='#' 
+                class='btn_AssignToLocation' 
+                data-id='<?php echo $$sf->Id; ?>' >
+                Assign to a Location
+            </a>
+<?php
+    } // END assign to a location
+?>
+            <a class='btn_OpenSFApp' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'>Open in Salesforce App</a>
 
+            <!-- BEGIN Replace Photo -->
             <form method="post" enctype="multipart/form-data" name="formUploadFile" class='frmReplacePicture' action="upload.php">
                 
                 <label for="replPic_<?php echo $$sf->Id; ?>" class='lbl_replacePicture'>        
@@ -165,23 +224,7 @@ function display_inventory($mySforceConnection, $response, $location){
                 <input type='hidden' name='auth' value='legit' />
                 <input type='hidden' name='id' value='<?php echo $$sf->Id; ?>' />
             </form>
-<?php
-    if('all' != $location){ // BEGIN allow quant change
-?>
-            <input type='text' 
-                class='changeQuant' 
-                data-id='<?php echo $$sf->Id; ?>' placeholder='Change Quantity'/>
-            <a href='#' 
-                class='btn_changeQuant' 
-                data-id='<?php echo $$sf->Id; ?>' 
-                data-location='<?php echo $location; ?>'>
-                Change Quantity
-            </a>
-<?php
-    } // END allow quant change
-?>
-
-            <a class='inv_button' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'>OPEN in <br />Salesforce App</a>
+            <!-- END Replace Photo -->
 
         </div> <!-- END .admin_drawer -->
         

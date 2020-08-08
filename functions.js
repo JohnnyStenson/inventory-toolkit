@@ -21,6 +21,51 @@ $('#display').delegate('.openAdminDrawer', 'click', function(e) {
 });
 
 
+/* Change Description */
+$('#display').delegate('.changeDescription', 'click', function(e) {
+    var id = $(this).data('id');
+    $('.btn_changeDescription[data-id="' + id + '"]').css('display', 'block');
+});
+$('#display').delegate('.btn_changeDescription', 'click', function(e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    var location = $(this).data('location');
+    var descr = $('.changeDescription[data-id="' + id + '"]').val();
+    
+    $.ajax({
+        type: "POST",
+        url: 'inv-controller.php',
+        data: {
+            run: 'changeDescription-inv',
+            id: id, 
+            descr: descr
+        },
+        success: function(response)
+        {
+            alert('Changed');
+
+            $.ajax({
+                type: "POST",
+                url: 'inv-controller.php',
+                data: {
+                    location_id: location,
+                    run: 'display-inv'
+                },
+                success: function(response)
+                {
+                    document.getElementById("display").innerHTML =response;
+                    $('#display').css('display','block');
+                    $('#menu').css('display','none');
+                    $('#menuHidden').css('display','block');
+                    document.getElementById("locationName").innerHTML =name;
+               }
+           });
+       }
+   });
+    
+});
+
+
 /* Change Quantity */
 $('#display').delegate('.changeQuant', 'click', function(e) {
     var id = $(this).data('id');
@@ -49,7 +94,7 @@ $('#display').delegate('.btn_changeQuant', 'click', function(e) {
                 type: "POST",
                 url: 'inv-controller.php',
                 data: {
-                    id: id,
+                    location_id: location,
                     run: 'display-inv'
                 },
                 success: function(response)
@@ -103,7 +148,7 @@ $('#display').delegate('.consumeJob', 'change', function(e) {
                 type: "POST",
                 url: 'inv-controller.php',
                 data: {
-                    id: id,
+                    loaction_id: location,
                     run: 'display-inv'
                 },
                 success: function(response)
@@ -129,7 +174,7 @@ $('.btnLocation').on('click', function(e) {
         type: "POST",
         url: 'inv-controller.php',
         data: {
-            id: id,
+            location_id: id,
             run: 'display-inv'
         },
         success: function(response)

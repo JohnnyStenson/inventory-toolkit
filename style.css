@@ -72,7 +72,7 @@ input[type='text']{
     font-size:30px;
     text-align:center;
 }
-.consumeQuant, .inv_quantity, .changeQuant{
+.consumeQuant, .inv_quantity, .changeQuant, .changeDescription{
     font-size:20px; 
     padding:10px; 
     display:block;
@@ -89,6 +89,7 @@ input[type='text']{
 }
 .admin_drawer{
     display:none;
+    margin:20px auto;
 }
 
 /* Tablet */
@@ -152,11 +153,11 @@ input[type='text']{
         font-size:20px; 
         display: inline-block; 
     }
-    .btn_changeQuant{
-        font-size: 20px;
-        line-height: 20px;
+    .btn_changeQuant, .btn_OpenSFApp, .btn_AssignToLocation, .btn_changeDescription{
+        font-size: 30px;
+        line-height: 30px;
         display: block;
-        margin-right: 20px auto;
+        margin: 20px auto;
         color: white;
         background-color: #009edb;
         padding: 20px;
@@ -164,7 +165,7 @@ input[type='text']{
         border: 1px solid #009edb;
         text-align: center;
         text-decoration:none;
-        display:none;
+
     }
 }
 /* Phone */
@@ -179,7 +180,7 @@ input[type='text']{
     .inv_quantity, .lbl_consumeJob{
         font-size:20px;
     }
-    .consumeQuant, .consumeJob, .changeQuant{
+    .consumeQuant, .consumeJob, .changeQuant, .changeDescription{
         width:200px;
         box-sizing:border-box;
         webkit-box-sizing: border-box;
@@ -193,5 +194,9 @@ input[type='text']{
     }
     .frmReplacePicture{
         width:200px;
+    }
+    .btn_changeQuant, .btn_OpenSFApp, .btn_AssignToLocation, .btn_changeDescription{
+        font-size: 20px;
+        line-height: 20px;
     }
 }
