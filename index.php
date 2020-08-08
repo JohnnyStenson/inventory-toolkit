@@ -1,5 +1,5 @@
 <?php
-session_start();
+if(!isset($_SESSION)) session_start(); 
 require 'site-auth.php';
 require_once 'functions.php';
 ?>
