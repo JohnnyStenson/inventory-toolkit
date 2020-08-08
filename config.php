@@ -38,15 +38,3 @@ $mySforceConnection->createConnection("/home/thunde91/lightning.thunderroadinc.c
 $mySforceConnection->login(USERNAME, PASSWORD.SECURITY_TOKEN);
 
 use Intervention\Image\ImageManager;
-
-/*defined("CLIENT_ID") or define("CLIENT_ID", getenv('CLIENT_ID'));
-
-defined("CLIENT_SECRET") or define("CLIENT_SECRET", getenv('CLIENT_SECRET'));
-
-defined("REDIRECT_URI") or define("REDIRECT_URI", "https://lightning.thunderroadinc.com/inventory/oauth_callback.php");
-
-defined("LOGIN_URI") or define("LOGIN_URI", "https://thundernj.my.salesforce.com");
-
-use BigFish\PDF417\PDF417;
-use BigFish\PDF417\Renderers\ImageRenderer;
-use BigFish\PDF417\Renderers\SvgRenderer;*/
