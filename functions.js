@@ -12,6 +12,21 @@
    });
     alert(tagId);
 });*/
+/* Admin Drawer */
+$('#display').delegate('.openAdminDrawer', 'click', function(e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    $('.admin_drawer[data-id="' + id + '"]').css('display', 'block');
+
+});
+
+
+/* Change Quantity */
+$('#display').delegate('.changeQuant', 'click', function(e) {
+    var id = $(this).data('id');
+    $('.btn_changeQuant[data-id="' + id + '"]').css('display', 'block');
+});
+
 
 /* Consume Inventory */
 $('#display').delegate('.consumeQuant', 'click', function(e) {
@@ -34,8 +49,9 @@ $('#display').delegate('.consumeJob', 'change', function(e) {
     
     $.ajax({
         type: "POST",
-        url: 'deduct-inventory.php',
+        url: 'inv-controller.php',
         data: {
+            run: 'use-inv',
             id: id, 
             location: location,
             jobId: jobId,
@@ -47,8 +63,11 @@ $('#display').delegate('.consumeJob', 'change', function(e) {
 
             $.ajax({
                 type: "POST",
-                url: 'display-inventory-by-location.php',
-                data: {id: location},
+                url: 'inv-controller.php',
+                data: {
+                    id: id,
+                    run: 'display-inv'
+                },
                 success: function(response)
                 {
                     document.getElementById("display").innerHTML =response;
@@ -72,8 +91,11 @@ $('.btnLocation').on('click', function(e) {
     var name = $(this).data('name');
     $.ajax({
         type: "POST",
-        url: 'display-inventory-by-location.php',
-        data: {id: id},
+        url: 'inv-controller.php',
+        data: {
+            id: id,
+            run: 'display-inv'
+        },
         success: function(response)
         {
             document.getElementById("display").innerHTML =response;
