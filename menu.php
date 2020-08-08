@@ -1,7 +1,6 @@
 <?php 
 
 require 'site-auth.php';
-//require_once 'access.php';
 require_once 'functions.php';
 ?>
 <!DOCTYPE html>
