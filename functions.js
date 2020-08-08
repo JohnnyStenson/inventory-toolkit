@@ -26,7 +26,45 @@ $('#display').delegate('.changeQuant', 'click', function(e) {
     var id = $(this).data('id');
     $('.btn_changeQuant[data-id="' + id + '"]').css('display', 'block');
 });
+$('#display').delegate('.btn_changeQuant', 'click', function(e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    var location = $(this).data('location');
+    var quant = $('.changeQuant[data-id="' + id + '"]').val();
+    
+    $.ajax({
+        type: "POST",
+        url: 'inv-controller.php',
+        data: {
+            run: 'changeQuant-inv',
+            id: id, 
+            location: location,
+            quant: quant
+        },
+        success: function(response)
+        {
+            alert('Changed');
 
+            $.ajax({
+                type: "POST",
+                url: 'inv-controller.php',
+                data: {
+                    id: id,
+                    run: 'display-inv'
+                },
+                success: function(response)
+                {
+                    document.getElementById("display").innerHTML =response;
+                    $('#display').css('display','block');
+                    $('#menu').css('display','none');
+                    $('#menuHidden').css('display','block');
+                    document.getElementById("locationName").innerHTML =name;
+               }
+           });
+       }
+   });
+    
+});
 
 /* Consume Inventory */
 $('#display').delegate('.consumeQuant', 'click', function(e) {
@@ -71,9 +109,7 @@ $('#display').delegate('.consumeJob', 'change', function(e) {
                 success: function(response)
                 {
                     document.getElementById("display").innerHTML =response;
-                    //document.getElementById("display").show();
                     $('#display').css('display','block');
-                    //document.getElementById("menu").hide();
                     $('#menu').css('display','none');
                     $('#menuHidden').css('display','block');
                     document.getElementById("locationName").innerHTML =name;

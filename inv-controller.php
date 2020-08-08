@@ -9,6 +9,9 @@ switch($_POST['run']){
     case "use-inv":
         deduct_inv_from_location($mySforceConnection, $_POST['id'], $_POST['location'], $_POST['jobId'], $_POST['quant'] );
         break;
+    case "changeQuant-inv":
+        change_quantity_location_of_inventory($mySforceConnection, $_POST['id'], $_POST['location'], $_POST['quant'] );
+        break;
     default:
         die('error');
 }

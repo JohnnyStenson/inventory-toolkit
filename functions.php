@@ -3,6 +3,26 @@ use BigFish\PDF417\PDF417;
 use BigFish\PDF417\Renderers\ImageRenderer;
 use BigFish\PDF417\Renderers\SvgRenderer;
 
+function change_quantity_location_of_inventory($mySforceConnection, $inv_id, $location_id, $quant ){
+    // get TrackIT__Inv_Location__c.Id 
+    $query = "SELECT Id FROM TrackIT__Inv_Location__c WHERE TrackIT__Inventory__c='" . $inv_id . "' AND TrackIT__Location__c='" . $location_id . "'";
+
+    $response = $mySforceConnection->query($query);
+    foreach ($response as $loi_record) {
+        $sObject = new SObject($loi_record);
+    }
+
+    //update new quant
+    $records[0] = new SObject();
+	$records[0]->Id = $sObject->Id;
+	$records[0]->fields = array(
+    	'TrackIT__Quantity__c' => $quant,
+	);
+	$records[0]->type = 'TrackIT__Inv_Location__c';
+
+	$response = $mySforceConnection->update($records);
+}
+
 function deduct_inv_from_location($mySforceConnection, $inv_id, $location_id, $job_id, $quant){
     $records = array();
 
@@ -128,23 +148,45 @@ function display_inventory($mySforceConnection, $response, $location){
         //echo "<a class='inv_button' href='https://thundernj.lightning.force.com/lightning/r/TrackIT__Inventory__c/".$record['Id']."/view?iospref=web'>Web</a>";
 ?>
         <div class='openDrawerBtns' data-id='<?php echo $$sf->Id; ?>'>
-            <div class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>A</div>
-            <div class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</div>
+            <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>A</a>
+            <a href='#' class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</a>
         </div>
         <div class='admin_drawer' data-id='<?php echo $$sf->Id; ?>'>
-            <form method="post" enctype="multipart/form-data" name="formUploadFile" id="uploadForm" action="upload.php">
-                <label for="exampleInputFile" style="font-size:20px; border: 3px solid black; display: block; padding: 20px; margin:20px; cursor: pointer;">
-                    <input type="file" id="exampleInputFile" name="file" >
+
+
+
+            <form method="post" enctype="multipart/form-data" name="formUploadFile" class='frmReplacePicture' action="upload.php">
+                
+                <label for="replPic_<?php echo $$sf->Id; ?>" class='lbl_replacePicture'>        
+                    <img src='uploads/rotate-camera-icon.png' style="display:block; margin:0 auto;"/> 
+                    Replace Picture
+                    <input type="file" id = "replPic_<?php echo $$sf->Id; ?>" class='replacePicture' name="file" style="display:none;" data-id='<?php echo $$sf->Id; ?>' onchange="this.form.submit()" >
                 </label>
                 <input type='hidden' name='auth' value='legit' />
                 <input type='hidden' name='id' value='<?php echo $$sf->Id; ?>' />
-                <button type="submit" class="btn btn-primary" name="btnSubmit" style="font-size:30px; padding:20px; margin:20px;">SUBMIT</button>
             </form>
-        </div>
+<?php
+    if('all' != $location){ // BEGIN allow quant change
+?>
+            <input type='text' 
+                class='changeQuant' 
+                data-id='<?php echo $$sf->Id; ?>' placeholder='Change Quantity'/>
+            <a href='#' 
+                class='btn_changeQuant' 
+                data-id='<?php echo $$sf->Id; ?>' 
+                data-location='<?php echo $location; ?>'>
+                Change Quantity
+            </a>
+<?php
+    } // END allow quant change
+?>
+
+            <a class='inv_button' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'>OPEN in <br />Salesforce App</a>
+
+        </div> <!-- END .admin_drawer -->
         
 <?php
-        // echo "<a class='inv_button' href='salesforce1://sObject/" . $$sf->Id . "/view'>OPEN in <br />Salesforce App</a>";
-        
+    
         echo "</div>"; // END div.inv_record
     }
 }
