@@ -127,7 +127,11 @@ function display_inventory($mySforceConnection, $response, $location){
         //echo "<div class='inv_barcode'><img src='".get_inventory_barcode($record['Name'])."' /></div>";
         //echo "<a class='inv_button' href='https://thundernj.lightning.force.com/lightning/r/TrackIT__Inventory__c/".$record['Id']."/view?iospref=web'>Web</a>";
 ?>
-        <div class='admin_drawer'>
+        <div class='openDrawerBtns' data-id='<?php echo $$sf->Id; ?>'>
+            <div class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>A</div>
+            <div class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</div>
+        </div>
+        <div class='admin_drawer' data-id='<?php echo $$sf->Id; ?>'>
             <form method="post" enctype="multipart/form-data" name="formUploadFile" id="uploadForm" action="upload.php">
                 <label for="exampleInputFile" style="font-size:20px; border: 3px solid black; display: block; padding: 20px; margin:20px; cursor: pointer;">
                     <input type="file" id="exampleInputFile" name="file" >

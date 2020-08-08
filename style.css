@@ -86,9 +86,14 @@ input[type='text']{
     margin: 20px auto;
     padding:20px;
 }
-
+.admin_drawer{
+    display:none;
+}
 /* Tablet */
 @media only screen and (max-width: 1000px) {
+    .btnLocation{
+        padding:30px 10px;
+    }
     .inv_record{
         display:block;
         text-align:center;
@@ -114,8 +119,23 @@ input[type='text']{
     .inv_quantity, .lbl_consumeJob{
         font-size:30px;
     }
-    .admin_drawer{
-        display:none;
+    .openDrawerBtns{
+        text-align:right;
+
+    }
+    .btnOpenDrawer{
+        font-size: 40px;
+        line-height: 40px;
+        display: inline-block;
+        margin-right: 10px;
+        color: white;
+        background-color: #009edb;
+        padding: 10px;
+        border-radius: 50%;
+        border: 1px solid #009edb;
+        width: 40px;
+        height: 40px;
+        text-align: center;
     }
 
 }
@@ -136,5 +156,11 @@ input[type='text']{
         box-sizing:border-box;
         webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
+    }
+    .btnOpenDrawer{
+        font-size:20px;
+        line-height:20px;
+        width: 20px;
+        height: 20px;
     }
 }
