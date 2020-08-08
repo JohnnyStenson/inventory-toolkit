@@ -72,41 +72,6 @@ function display_inventory($mySforceConnection, $response, $location){
     }
 
     foreach ($response as $record) {
-        $sObject = new SObject($record);
-        if('all' !== $location){
-            $sObject2 = new SObject($sObject->fields->TrackIT__Inventory__r);
-        }
-
-        echo "<div class='inv_record'>";
-
-        if('all' == $location){
-            echo "<div class='inv_name'>" . $sObject->fields->Name . "<br /><br />" . $sObject->fields->TrackIT__Description__c . "</div>";
-        }else{
-            echo "<div class='inv_name'>" . $sObject2->fields->Name . "<br /><br />" . $sObject2->fields->TrackIT__Description__c . "</div>";
-        }
-        
-        if('all' == $location){
-            echo "<div class='inv_image_container'><img class='inv_image' src='" . $sObject->fields->Image_for_ListView__c . "' /></div>";
-        }else{
-            echo "<div class='inv_image_container'><img class='inv_image' src='" . $sObject2->fields->Image_for_ListView__c . "' /></div>";
-        }
-        
-
-        if('all' == $location){
-            echo "<div class='inv_quantity'> Current #: " . $sObject->fields->TrackIT__Total_Quantity__c . "</div>";
-        }else{
-            echo "
-            <div class='inv_quantity'> <span style='font-size:20px; font-weight:bold;'>Current #: " . $sObject->fields->TrackIT__Quantity__c . "</span><br />
-                <div class='used' data-id='" . $sObject2->Id . "'>
-                    <input type='text' class='consumeQuant' style='font-size:20px; padding:10px; margin-bottom:20px; display:block;' data-id='" . $sObject2->Id . "' placeholder='# USED'/>
-                    
-                    <select class='consumeJob' data-id='" . $sObject2->Id . "' data-location='" . $location . "' data-current='" . $sObject->fields->TrackIT__Quantity__c . "'  style='display:none;' ><option value='0'>Choose Job Used on to Deduct from Inventory:</option>" .
-                    $ploJobs .
-                    "</select>
-                </div>
-            </div>";
-        }
-    
         /*
         SObject Object ( 
             [type] => TrackIT__Inv_Location__c 
@@ -127,31 +92,56 @@ function display_inventory($mySforceConnection, $response, $location){
         )
         */
 
+        $suffix = '';
+        $sObject = new SObject($record);
+        if('all' !== $location){
+            $sObject2 = new SObject($sObject->fields->TrackIT__Inventory__r);
+            $suffix = '2';
+        }
+        $sf = 'sObject'.$suffix; // Dynamic Variable
+
+        echo "<div class='inv_record'>"; // BEGIN div.inv_record
+
+        echo "<div class='inv_name'>" . $$sf->fields->Name . "</div>";
+        if(!empty($$sf->fields->TrackIT__Description__c)){
+            echo "<div class='inv_name'>" . $$sf->fields->TrackIT__Description__c . "</div>";
+        }
+
+        echo "<div class='inv_image_container'><img class='inv_image' src='" . $$sf->fields->Image_for_ListView__c . "' /></div>";
+
+        echo "<div class='inv_quantity'> Current Quantity: " . (('all' != $location) ? $sObject->fields->TrackIT__Quantity__c : $sObject->fields->TrackIT__Total_Quantity__c ) . "</div>";
+
+        if('all' != $location){
+            echo "<div class='inv_use'>
+                    <div class='used' data-id='" . $$sf->Id . "'>
+                        <input type='text' class='consumeQuant' data-id='" . $$sf->Id . "' placeholder='# USED'/>
+                        
+                        <label class='lbl_consumeJob' style='display:none;' data-id='" . $$sf->Id . "' >Select Job Used on to <br />Deduct from Inventory:</label>
+                        <select class='consumeJob' data-id='" . $$sf->Id . "' data-location='" . $location . "' data-current='" . $sObject->fields->TrackIT__Quantity__c . "'  ><option value='0'>Choose:</option>" .
+                        $ploJobs .
+                        "</select>
+                    </div>
+                </div>";
+        }
+
         //echo "<div class='inv_barcode'><img src='".get_inventory_barcode($record['Name'])."' /></div>";
         //echo "<a class='inv_button' href='https://thundernj.lightning.force.com/lightning/r/TrackIT__Inventory__c/".$record['Id']."/view?iospref=web'>Web</a>";
 ?>
-        <form method="post" enctype="multipart/form-data" name="formUploadFile" id="uploadForm" action="upload.php">
-            <label for="exampleInputFile" style="font-size:20px; border: 3px solid black; display: block; padding: 20px; margin:20px; cursor: pointer;">
-                <input type="file" id="exampleInputFile" name="file" >
-            </label>
-            <input type='hidden' name='auth' value='legit' />
-            <input type='hidden' name='id' value='<?php 
-            if('all' == $location){
-                echo $sObject->Id;  
-            }else{
-                echo $sObject2->Id;  
-            }
-            ?>' />
-            <button type="submit" class="btn btn-primary" name="btnSubmit" style="font-size:30px; padding:20px; margin:20px;">SUBMIT</button>			
-        </form>
-<?php
-        /*if('all' == $location){
-            echo "<a class='inv_button' href='salesforce1://sObject/" . $sObject->Id . "/view'>OPEN in <br />Salesforce App</a>";
-        }else{
-            echo "<a class='inv_button' href='salesforce1://sObject/" . $sObject2->Id . "/view'>OPEN in <br />Salesforce App</a>"; 
-        }*/
+        <div class='admin_drawer'>
+            <form method="post" enctype="multipart/form-data" name="formUploadFile" id="uploadForm" action="upload.php">
+                <label for="exampleInputFile" style="font-size:20px; border: 3px solid black; display: block; padding: 20px; margin:20px; cursor: pointer;">
+                    <input type="file" id="exampleInputFile" name="file" >
+                </label>
+                <input type='hidden' name='auth' value='legit' />
+                <input type='hidden' name='id' value='<?php echo $$sf->Id; ?>' />
+                <button type="submit" class="btn btn-primary" name="btnSubmit" style="font-size:30px; padding:20px; margin:20px;">SUBMIT</button>
+            </form>
+        </div>
         
-        echo "</div>";
+<?php
+        // echo "<a class='inv_button' href='salesforce1://sObject/" . $$sf->Id . "/view'>OPEN in <br />Salesforce App</a>";
+        
+        echo "</div>"; // END div.inv_record
     }
 }
 

@@ -13,7 +13,7 @@ require_once 'functions.php';
   <title>Inventory</title>
   <meta name="description" content="Inventory">
   <meta name="author" content="Johnny Stenson">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" media="screen" href="style.css?v=1.0">
   <link rel="stylesheet" media="print" href="print.css?v=1.0">
 </head>

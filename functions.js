@@ -17,6 +17,8 @@
 $('#display').delegate('.consumeQuant', 'click', function(e) {
     var id = $(this).data('id');
     $('.consumeJob[data-id="' + id + '"]').css('display', 'block');
+    $('.lbl_consumeJob[data-id="' + id + '"]').css('display', 'block');
+
 });
 $('#display').delegate('.consumeJob', 'change', function(e) {
     var id = $(this).data('id');
