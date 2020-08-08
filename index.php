@@ -1,25 +1,50 @@
 <?php
 session_start();
-$_SESSION['site_auth'] = FALSE;
+require 'site-auth.php';
+require_once 'functions.php';
 ?>
 
 <!DOCTYPE html>
 
 <html lang="en">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Inventory</title>
-        <meta name="description" content="Inventory">
-        <meta name="author" content="Johnny Stenson">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" media="screen" href="style.css?v=1.0">
-    </head>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Inventory</title>
+    <meta name="description" content="Inventory">
+    <meta name="author" content="Johnny Stenson">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" media="screen" href="style.css?v=1.0">
+    <link rel="stylesheet" media="print" href="print.css?v=1.0">
+</head>
 
-    <body>
-        <form method='post' action='menu.php' style="text-align:center;">
-            <input type="password" name='pw' style='font-size:30px; padding:20px; margin:50px 0px; width:200px;' />
-            
-            <button type="submit" id="btnLogin">Submit Password <br /> Enviar Senha</button>
-        </form>
-    </body>
+<body>
+    <div id="google_translate_element"></div>
+    <script>
+
+      function googleTranslateElementInit() {
+
+        new google.translate.TranslateElement({
+
+          pageLanguage: 'en'
+
+        }, 'google_translate_element');
+
+      }
+
+    </script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
+    <div id="menu">
+      <?php show_all_locations($mySforceConnection); ?>
+    </div>  
+    <div id="menuHidden" style="display:none;">
+      <a id='btnShowLocationButtons' href='#'>Change Location</a>
+      <h2 id="locationName"></h2>
+    </div>
+
+    <div id="display"></div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
+    <script src="functions.js"></script>
+</body>
 </html>

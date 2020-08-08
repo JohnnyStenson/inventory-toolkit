@@ -52,11 +52,9 @@
                 });
 
                 $image->save('uploads/'.$newFileName, 60);
-                
-
-                
+                                
                 if(update_img_url($mySforceConnection, $_POST['id'], $newFileName)){
-                    echo "<a href='https://lightning.thunderroadinc.com/inventory/menu.php' style='font-size:30px; margin:50px; padding:20px;display:block; border:5px solid black; color:black; text-align:center; text-decoration:none; '>Go Back</a>";
+                    echo "<a href='https://lightning.thunderroadinc.com/inventory/index.php' style='font-size:30px; margin:50px; padding:20px;display:block; border:5px solid black; color:black; text-align:center; text-decoration:none; '>Go Back</a>";
                 }
 			}
 		}
