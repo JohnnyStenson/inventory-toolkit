@@ -54,15 +54,15 @@ if($_SESSION['site_auth']){
 <?php
 }
 ?>
-    <div id="menuInit" style='display:none;'>
-        <div id="menu">
-            <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
-        </div>  
-        <div id="menuHidden" style="display:none;">
-            <a id='btnShowLocationButtons' href='#'>Change Location</a>
-            <h2 id="locationName"></h2>
-        </div>
+
+    <div id="menu">
+        <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
+    </div>  
+    <div id="menuHidden" style="display:none;">
+        <a id='btnShowLocationButtons' href='#'>Change Location</a>
+        <h2 id="locationName"></h2>
     </div>
+
     
 
     <div id="display"></div>
