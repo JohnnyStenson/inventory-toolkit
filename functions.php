@@ -77,13 +77,33 @@ function show_all_locations($mySforceConnection){
 }
 
 
+/* Query Items by Location */
+function query_inv_by_location($mySforceConnection, $id){
+    if($id == 'all'){
+        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c FROM TrackIT__Inventory__c";
+        $location = 'all';
+    }else{
+        $query = "SELECT TrackIT__Quantity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c 
+            FROM TrackIT__Inv_Location__c 
+            WHERE TrackIT__Location__c = '" . $id . "'
+            AND isDeleted = false";
+
+        $location=$id;
+    }
+    
+    $response = $mySforceConnection->query($query);
+
+    display_inventory($mySforceConnection, $response, $location);
+}
+
+
 /* Query Inv by Location */
 function query_inv_by_location($mySforceConnection, $id){
     if($id == 'all'){
-        $query = "SELECT Name, Id, TrackIT__Inventory_Image__c, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c FROM TrackIT__Inventory__c";
+        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c FROM TrackIT__Inventory__c";
         $location = 'all';
     }else{
-        $query = "SELECT TrackIT__Quantity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.TrackIT__Inventory_Image__c, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c 
+        $query = "SELECT TrackIT__Quantity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c 
             FROM TrackIT__Inv_Location__c 
             WHERE TrackIT__Location__c = '" . $id . "'
             AND isDeleted = false";
@@ -128,7 +148,6 @@ function display_inventory($mySforceConnection, $response, $location){
                     [fields] => stdClass Object ( 
                         [Name] => Jumper Cables 2 Guage 20 
                         [Id] => a3S1U000000ifX2UAI 
-                        [TrackIT__Inventory_Image__c] => 
                         [Image_for_ListView__c] => https://www.harborfreight.com/media/catalog/product/cache/0/image/200x/9df78eab33525d08d6e5fb8d27136e95/i/m/image_21635.jpg 
                         [TrackIT__Description__c] => 
                     ) 
