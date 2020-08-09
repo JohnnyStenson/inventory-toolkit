@@ -3,7 +3,7 @@ if(!isset($_SESSION)) session_start();
 require_once 'config.php';
 require_once 'functions.php';
 
-if(!$_SESSION['site_auth'] || !isset($_SESSION['role'])){
+if(!isset($_SESSION['site_auth']) || !$_SESSION['site_auth'] || !isset($_SESSION['role'])){
     display_logon();
 }else{
     $mySforceConnection->login(

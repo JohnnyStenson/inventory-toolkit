@@ -2,7 +2,7 @@
 use BigFish\PDF417\PDF417;
 use BigFish\PDF417\Renderers\ImageRenderer;
 use BigFish\PDF417\Renderers\SvgRenderer;
-
+if(!isset($_SESSION)) session_start();
 
 function display_logon(){
 ?>
@@ -14,6 +14,13 @@ function display_logon(){
 <?php
 }
 
+/*session inv_item Type */
+function get_session_inv_item(){
+    echo isset($_SESSION['inv_item']) ? $_SESSION['inv_item'] : 0;
+}
+function set_session_inv_item($inv_item){
+    $_SESSION['inv_item'] = $inv_item;
+}
 
 /* Change Description of Inventory */
 function change_description_of_inventory($mySforceConnection, $id, $descr){
@@ -232,7 +239,7 @@ function display_inventory($mySforceConnection, $response, $location){
                 <label for="replPic_<?php echo $$sf->Id; ?>" class='lbl_replacePicture'>        
                     <img src='uploads/rotate-camera-icon.png' style="display:block; margin:0 auto;"/> 
                     Replace Picture
-                    <input type="file" id = "replPic_<?php echo $$sf->Id; ?>" class='replacePicture' name="file" style="display:none;" data-id='<?php echo $$sf->Id; ?>' onchange="this.form.submit()" >
+                    <input type="file" id = "replPic_<?php echo $$sf->Id; ?>" class='replacePicture' name="file" style="display:none;" data-id='<?php echo $$sf->Id; ?>' onchange="$('#loading_overlay').css('display','block'); this.form.submit();" >
                 </label>
                 <input type='hidden' name='auth' value='legit' />
                 <input type='hidden' name='id' value='<?php echo $$sf->Id; ?>' />

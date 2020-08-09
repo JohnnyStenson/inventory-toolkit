@@ -41,19 +41,29 @@ if(isset($_SESSION['site_auth']) && $_SESSION['site_auth']){
 
     </script>
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <?php require 'site-auth.php'; ?>
+<?php require 'site-auth.php'; ?>
     <br class='clear' />
+<?php
+if($_SESSION['site_auth']){
+?>
     <div id="menuInvItem">
-        <a id='btn_MenuInv' class='btn_menuInvItem' href='#'>Inventory</a>
-        <a id='btn_MenuItem' class='btn_menuInvItem' href='#'>Equipment</a>
+        <a href='#' id='btn_Menu_inv' class='btn_menuInvItem' data-type='inv'>Inventory</a>
+
+        <a href='#' id='btn_Menu_item' class='btn_menuInvItem'  data-type='item'>Equipment</a>
     </div>
-    <div id="menu">
-        <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
-    </div>  
-    <div id="menuHidden" style="display:none;">
-        <a id='btnShowLocationButtons' href='#'>Change Location</a>
-        <h2 id="locationName"></h2>
+<?php
+}
+?>
+    <div id="menuInit" style='display:none;'>
+        <div id="menu">
+            <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
+        </div>  
+        <div id="menuHidden" style="display:none;">
+            <a id='btnShowLocationButtons' href='#'>Change Location</a>
+            <h2 id="locationName"></h2>
+        </div>
     </div>
+    
 
     <div id="display"></div>
 

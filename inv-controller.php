@@ -3,6 +3,12 @@ require 'site-auth.php';
 require_once 'functions.php';
 
 switch($_POST['run']){
+    case "get_inv_item":
+        get_session_inv_item();
+        break;
+    case "set_inv_item":
+        set_session_inv_item($_POST['inv_item']);
+        break;
     case "display-inv":
         query_inv_by_location($mySforceConnection, $_POST['location_id']);
         break;
