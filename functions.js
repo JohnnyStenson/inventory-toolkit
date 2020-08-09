@@ -39,7 +39,7 @@ $(document).ready(function(){
             {
                 $('#menuInvItem a').removeClass('btn_menuInvItem_selected');
                 $('#btn_Menu_' + inv_item).addClass('btn_menuInvItem_selected');
-                $('#loading_overlay').css('display','none');
+                display_records();
             }
         });
     });

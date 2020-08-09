@@ -76,44 +76,169 @@ function show_all_locations($mySforceConnection){
     }
 }
 
+/* Main Query Switch */
+function main_query($mySforceConnection, $location_id, $type){
+    switch($type){
+        case 'inv':
+            query_inv_by_location($mySforceConnection, $location_id);
+        break;
+        case 'item':
+            query_item_by_location($mySforceConnection, $location_id);
+        break;    
+    };
+}
 
 /* Query Items by Location */
-function query_inv_by_location($mySforceConnection, $id){
-    if($id == 'all'){
-        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c FROM TrackIT__Inventory__c";
-        $location = 'all';
+function query_item_by_location($mySforceConnection, $location_id){
+    if($location_id == 'all'){
+        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, Alternate_Description__c, TrackIT__Location__c 
+            FROM TrackIT__Item__c 
+            WHERE isDeleted = false";
     }else{
-        $query = "SELECT TrackIT__Quantity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c 
-            FROM TrackIT__Inv_Location__c 
-            WHERE TrackIT__Location__c = '" . $id . "'
+        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, Alternate_Description__c, TrackIT__Location__c 
+            FROM TrackIT__Item__c 
+            WHERE TrackIT__Location__c = '" . $location_id . "'
             AND isDeleted = false";
-
-        $location=$id;
     }
     
     $response = $mySforceConnection->query($query);
 
-    display_inventory($mySforceConnection, $response, $location);
+    display_items($mySforceConnection, $response, $location_id);
+}
+
+
+/* Main Display Items */
+function display_items($mySforceConnection, $response, $location){
+    if('all' !== $location){
+        $arrayJobs = get_job_list($mySforceConnection);
+        $ploJobs = '';
+        foreach($arrayJobs as $jobId => $jobName){
+            $ploJobs .= "<option value='" . $jobId . "'>" . $jobName . "</option>";
+        }
+    }
+
+    foreach ($response as $record) {
+        $sObject = new SObject($record);
+        $sf = 'sObject'; // Dynamic Variable
+
+        echo "<div class='inv_record'>"; // BEGIN div.inv_record
+
+        echo "<div class='inv_name'>" . $$sf->fields->TrackIT__Description__c . "</div>";
+        if(!empty($$sf->fields->Alternate_Description__c)){
+            echo "<div class='inv_name'>" . $$sf->fields->Alternate_Description__c . "</div>";
+        }
+
+        echo "<div class='inv_image_container'><img class='inv_image' src='" . $$sf->fields->Image_for_ListView__c . "' /></div>";
+
+        echo "<div class='inv_quantity'> ID #: " . $sObject->fields->Name . "</div>";
+        /*
+        if('all' != $location){
+            echo "<div class='inv_use'>
+                    <div class='used' data-id='" . $$sf->Id . "'>
+                        <input type='text' class='consumeQuant' data-id='" . $$sf->Id . "' placeholder='# USED'/>
+                        
+                        <label class='lbl_consumeJob' style='display:none;' data-id='" . $$sf->Id . "' >Select Job Used on to <br />Deduct from Inventory:</label>
+                        <select class='consumeJob' data-id='" . $$sf->Id . "' data-location='" . $location . "' data-current='" . $sObject->fields->TrackIT__Quantity__c . "'  ><option value='0'>Choose:</option>" .
+                        $ploJobs .
+                        "</select>
+                    </div>
+                </div>";
+        }
+
+        //echo "<div class='inv_barcode'><img src='".get_inventory_barcode($record['Name'])."' /></div>";
+        //echo "<a class='inv_button' href='https://thundernj.lightning.force.com/lightning/r/TrackIT__Inventory__c/".$record['Id']."/view?iospref=web'>Web</a>";
+
+        if('CREW' != $_SESSION['role']){
+?>
+        <div class='openDrawerBtns' data-id='<?php echo $$sf->Id; ?>'>
+            <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>A</a>
+            <a href='#' class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</a>
+        </div>
+        <div class='admin_drawer' data-id='<?php echo $$sf->Id; ?>'>
+            
+            <!-- BEGIN Change description -->
+            <input type='text' 
+                class='changeDescription' 
+                data-id='<?php echo $$sf->Id; ?>' 
+                placeholder='Change Description'
+            />
+            <a href='#' 
+                class='btn_changeDescription'
+                style='display:none;' 
+                data-id='<?php echo $$sf->Id; ?>'
+                data-location='<?php echo $location; ?>' >
+                Change Description
+            </a>
+            <!-- END Change description -->
+
+<?php
+    if('all' != $location){ // BEGIN allow quant change
+?>
+            <input type='text' 
+                class='changeQuant' 
+                data-id='<?php echo $$sf->Id; ?>' placeholder='Change Quantity'
+            />
+            <a href='#' 
+                class='btn_changeQuant'
+                style='display:none;' 
+                data-id='<?php echo $$sf->Id; ?>' 
+                data-location='<?php echo $location; ?>'>
+                Change Quantity
+            </a>
+<?php
+    } // END allow quant change
+
+    if('all' == $location){ // BEGIN assign to a location
+?>
+            <a href='#' 
+                class='btn_AssignToLocation' 
+                data-id='<?php echo $$sf->Id; ?>' >
+                Assign to a Location
+            </a>
+<?php
+    } // END assign to a location
+?>
+            <a class='btn_OpenSFApp' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'>Open in Salesforce App</a>
+
+            <!-- BEGIN Replace Photo -->
+            <form method="post" enctype="multipart/form-data" name="formUploadFile" class='frmReplacePicture' action="upload.php">
+                
+                <label for="replPic_<?php echo $$sf->Id; ?>" class='lbl_replacePicture'>        
+                    <img src='uploads/rotate-camera-icon.png' style="display:block; margin:0 auto;"/> 
+                    Replace Picture
+                    <input type="file" id = "replPic_<?php echo $$sf->Id; ?>" class='replacePicture' name="file" style="display:none;" data-id='<?php echo $$sf->Id; ?>' onchange="$('#loading_overlay').css('display','block'); this.form.submit();" >
+                </label>
+                <input type='hidden' name='auth' value='legit' />
+                <input type='hidden' name='id' value='<?php echo $$sf->Id; ?>' />
+            </form>
+            <!-- END Replace Photo -->
+
+        </div> <!-- END .admin_drawer -->
+        
+<?php
+    }
+    */
+        echo "</div>"; // END div.inv_record
+    }
 }
 
 
 /* Query Inv by Location */
-function query_inv_by_location($mySforceConnection, $id){
-    if($id == 'all'){
-        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c FROM TrackIT__Inventory__c";
-        $location = 'all';
+function query_inv_by_location($mySforceConnection, $location_id){
+    if($location_id == 'all'){
+        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c 
+            FROM TrackIT__Inventory__c 
+            WHERE isDeleted = false";
     }else{
         $query = "SELECT TrackIT__Quantity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c 
             FROM TrackIT__Inv_Location__c 
-            WHERE TrackIT__Location__c = '" . $id . "'
+            WHERE TrackIT__Location__c = '" . $location_id . "'
             AND isDeleted = false";
-
-        $location=$id;
     }
     
     $response = $mySforceConnection->query($query);
 
-    display_inventory($mySforceConnection, $response, $location);
+    display_inventory($mySforceConnection, $response, $location_id);
 }
 
 function get_job_list($mySforceConnection){

@@ -13,7 +13,9 @@ switch($_POST['run']){
         $_SESSION['location_id'] = filter_var($_POST['location_id'], FILTER_SANITIZE_STRING);
         break;
     case "display-inv":
-        query_inv_by_location($mySforceConnection, $_SESSION['location_id']);
+        if(isset($_SESSION['location_id'])){
+            main_query($mySforceConnection, $_SESSION['location_id'], $_SESSION['inv_item']);
+        }
         break;
     case "use-inv":
         deduct_inv_from_location($mySforceConnection, $_POST['id'], $_SESSION['location_id'], $_POST['jobId'], $_POST['quant']);
