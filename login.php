@@ -14,6 +14,7 @@ if(isset($_POST['pw'])){
         default:
             die();
     }
+    $_SESSION['inv_item'] = 'inv';
 }else{
     die();
 }
