@@ -2,7 +2,6 @@ $(document).ready(function(){
 
     /* get current type (for refresh and init)*/
     if($('#menuInvItem').length) get_inv_item();
-
     function get_inv_item(){
         $('#loading_overlay').css('display','block');
         $.ajax({
@@ -21,6 +20,7 @@ $(document).ready(function(){
             }
         });
     }
+
 
     /* Change  Type */
     $('body').delegate('.btn_menuInvItem', 'click', function(e) {
@@ -43,6 +43,7 @@ $(document).ready(function(){
             }
         });
     });
+
 
     /* Login */
     $('#btnLogin').on('click', function(e) {
@@ -99,27 +100,9 @@ $(document).ready(function(){
             success: function(response)
             {
                 alert('Changed');
-
-                $.ajax({
-                    type: "POST",
-                    url: 'inv-controller.php',
-                    data: {
-                        location_id: location,
-                        run: 'display-inv'
-                    },
-                    success: function(response)
-                    {
-                        document.getElementById("display").innerHTML =response;
-                        $('#display').css('display','block');
-                        $('#menu').css('display','none');
-                        $('#menuHidden').css('display','block');
-                        document.getElementById("locationName").innerHTML =name;
-                        $('#loading_overlay').css('display','none');
-                }
-            });
-        }
-    });
-        
+                display_records();
+            }
+        });
     });
 
 
@@ -147,28 +130,11 @@ $(document).ready(function(){
             success: function(response)
             {
                 alert('Changed');
+                display_records();
+            }
+        });
+    });
 
-                $.ajax({
-                    type: "POST",
-                    url: 'inv-controller.php',
-                    data: {
-                        location_id: location,
-                        run: 'display-inv'
-                    },
-                    success: function(response)
-                    {
-                        document.getElementById("display").innerHTML =response;
-                        $('#display').css('display','block');
-                        $('#menu').css('display','none');
-                        $('#menuHidden').css('display','block');
-                        document.getElementById("locationName").innerHTML =name;
-                        $('#loading_overlay').css('display','none');
-                }
-            });
-        }
-    });
-        
-    });
 
     /* Consume Inventory */
     $('#display').delegate('.consumeQuant', 'click', function(e) {
@@ -184,8 +150,6 @@ $(document).ready(function(){
         var quant = parseInt($('.consumeQuant[data-id="' + id + '"]').val());
         var current = parseInt($(this).data('current'));
         var jobId = $(this).val();
-
-        //alert('quant: ' + quant + ' \ncurrent: ' + current);
 
         if(quant > current || 0 == quant || '' == quant){
             alert('Deducting too many or none. Refresh page and try again. / Deduzindo muitos ou nenhum. Atualize a página e tente novamente.');
@@ -205,53 +169,34 @@ $(document).ready(function(){
             success: function(response)
             {
                 alert('Deducted');
+                display_records();
+            }
+        });
+    });
 
-                $.ajax({
-                    type: "POST",
-                    url: 'inv-controller.php',
-                    data: {
-                        location_id: location,
-                        run: 'display-inv'
-                    },
-                    success: function(response)
-                    {
-                        document.getElementById("display").innerHTML =response;
-                        $('#display').css('display','block');
-                        $('#menu').css('display','none');
-                        $('#menuHidden').css('display','block');
-                        document.getElementById("locationName").innerHTML =name;
-                        $('#loading_overlay').css('display','none');
-                }
-            });
-        }
-    });
-        
-    });
 
     /* Location Buttons */
     $('.btnLocation').on('click', function(e) {
         e.preventDefault();
         $('#loading_overlay').css('display','block');
-        var id = $(this).data('id');
+        var location_id = $(this).data('id');
         var name = $(this).data('name');
         $.ajax({
             type: "POST",
             url: 'inv-controller.php',
             data: {
-                location_id: id,
-                run: 'display-inv'
+                location_id: location_id,
+                run: 'set_location_id'
             },
             success: function(response)
             {
-                document.getElementById("display").innerHTML =response;
-                $('#display').css('display','block');
-                $('#menu').css('display','none');
-                $('#menuHidden').css('display','block');
                 document.getElementById("locationName").innerHTML =name;
-                $('#loading_overlay').css('display','none');
+                display_records();
+
             }
         });
     });
+
 
     /* Display Location Buttons */
     $('#btnShowLocationButtons').on('click', function(e) {
@@ -263,3 +208,21 @@ $(document).ready(function(){
 
     
 });
+
+function display_records(){
+    $.ajax({
+        type: "POST",
+        url: 'inv-controller.php',
+        data: {
+            run: 'display-inv'
+        },
+        success: function(response)
+        {
+            document.getElementById("display").innerHTML =response;
+            $('#display').css('display','block');
+            $('#menu').css('display','none');
+            $('#menuHidden').css('display','block');
+            $('#loading_overlay').css('display','none');
+        }
+    });
+}

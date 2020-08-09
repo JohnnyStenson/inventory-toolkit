@@ -14,14 +14,6 @@ function display_logon(){
 <?php
 }
 
-/*session inv_item Type */
-function get_session_inv_item(){
-    echo isset($_SESSION['inv_item']) ? $_SESSION['inv_item'] : 0;
-}
-function set_session_inv_item($inv_item){
-    $_SESSION['inv_item'] = $inv_item;
-}
-
 /* Change Description of Inventory */
 function change_description_of_inventory($mySforceConnection, $id, $descr){
     $records[0] = new SObject();
