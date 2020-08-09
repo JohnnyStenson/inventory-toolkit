@@ -34,8 +34,8 @@ input[type='text']{
     line-height: 20px;
     display: block;
     margin: 10px;
-    color: white;
-    background-color: #009edb;
+    color: #009edb;
+    background-color: #fff;
     padding: 10px;
     border-radius: 20px;
     border: 1px solid #009edb;
@@ -51,23 +51,49 @@ input[type='text']{
     font-size:20px;
     border-radius:10px;
     text-decoration: none;
-    border: 1px solid blue;
+    border: 1px solid #009edb;
     display:block;
     font-weight: bold;
-    color:blue;
+    color:#009edb;
     background-color: #fff;
+}
+
+#menuInvItem{
+    width:100%;
+    padding:0;
+    margin:0;
+    clear:both;
+}
+.btn_menuInvItem{
+    font-size: 20px;
+    line-height: 20px;
+    display: inline-block;
+    margin: 2%;
+    padding: 2%;
+    width:40%;
+    border-radius: 10px;
+    border: 1px solid #009edb;
+    text-align: center;
+    text-decoration:none;
+
+    color: #009edb;
+    background-color: #fff;
+}
+.btn_menuInvItem_selected{
+    background-color: #009edb !important;
+    color: #fff !important;
 }
 
 .btnLocation, #btnShowLocationButtons{
     border-radius:10px;
     text-decoration: none;
-    border: 1px solid blue;
+    border: 1px solid #009edb;
     padding: 15px;
     margin:10px;
     display:block;
     font-size:20px;
     text-align:center;
-    color: blue;
+    color: #009edb;
 }
 
 /* Google Translate Button */
@@ -104,7 +130,7 @@ input[type='text']{
 .inv_button{
     border-radius:10px;
     text-decoration: none;
-    border: 1px solid blue;
+    border: 1px solid #009edb;
     padding: 20px;
     margin:10px;
     display:block;

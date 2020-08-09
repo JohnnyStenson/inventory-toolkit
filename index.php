@@ -43,12 +43,16 @@ if(isset($_SESSION['site_auth']) && $_SESSION['site_auth']){
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <?php require 'site-auth.php'; ?>
     <br class='clear' />
+    <div id="menuInvItem">
+        <a id='btn_MenuInv' class='btn_menuInvItem' href='#'>Inventory</a>
+        <a id='btn_MenuItem' class='btn_menuInvItem' href='#'>Equipment</a>
+    </div>
     <div id="menu">
-      <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
+        <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
     </div>  
     <div id="menuHidden" style="display:none;">
-      <a id='btnShowLocationButtons' href='#'>Change Location</a>
-      <h2 id="locationName"></h2>
+        <a id='btnShowLocationButtons' href='#'>Change Location</a>
+        <h2 id="locationName"></h2>
     </div>
 
     <div id="display"></div>
