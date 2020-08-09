@@ -6,7 +6,7 @@ use BigFish\PDF417\Renderers\SvgRenderer;
 
 function display_logon(){
 ?>
-    <form method='post' action='#' style='text-align:center;'>
+    <form method='post' action='#' style='text-align:center;'id='frmLogin'>
         <input type='password' id='pw' name='pw' style='font-size:30px; padding:20px; margin:50px 0px; width:200px;' />
         
         <a href='#' id='btnLogin'>Submit Password <br /> Enviar Senha</a>

@@ -2,6 +2,10 @@ $(document).ready(function(){
     /* Login */
     $('#btnLogin').on('click', function(e) {
         e.preventDefault();
+        $('#frmLogin').submit();
+    });
+    $('#frmLogin').on('submit', function(e) {
+        e.preventDefault();
         $('#loading_overlay').css('display','block');
         var pw = $('#pw').val();
         $.ajax({
