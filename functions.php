@@ -173,6 +173,8 @@ function display_inventory($mySforceConnection, $response, $location){
 
         //echo "<div class='inv_barcode'><img src='".get_inventory_barcode($record['Name'])."' /></div>";
         //echo "<a class='inv_button' href='https://thundernj.lightning.force.com/lightning/r/TrackIT__Inventory__c/".$record['Id']."/view?iospref=web'>Web</a>";
+
+        if('CREW' != $_SESSION['role']){
 ?>
         <div class='openDrawerBtns' data-id='<?php echo $$sf->Id; ?>'>
             <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>A</a>
@@ -240,7 +242,7 @@ function display_inventory($mySforceConnection, $response, $location){
         </div> <!-- END .admin_drawer -->
         
 <?php
-    
+    }
         echo "</div>"; // END div.inv_record
     }
 }
