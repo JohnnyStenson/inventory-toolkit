@@ -1,6 +1,6 @@
 <?php 
 require_once 'config.php';
-
+require_once 'functions.php';
 if(isset($_POST['pw'])){
     switch(filter_var($_POST['pw'], FILTER_SANITIZE_STRING)){
         case CREW_SITEPW:
@@ -12,8 +12,8 @@ if(isset($_POST['pw'])){
             $_SESSION['role'] = 'MNGR';
         break;
         default:
-            die(display_logon());
+            die();
     }
 }else{
-    die(display_logon());
+    die();
 }

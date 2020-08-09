@@ -4,6 +4,9 @@ body{
 input[type='text']{
     border:1px black solid;
 }
+.clear{
+    clear:both;
+}
 #loading_overlay{
 
 	top: 0;
@@ -20,6 +23,24 @@ input[type='text']{
 
 	display:none;
 
+}
+
+#logout{
+    float:right;
+}
+
+#btn_logout{
+    font-size: 20px;
+    line-height: 20px;
+    display: block;
+    margin: 10px;
+    color: white;
+    background-color: #009edb;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #009edb;
+    text-align: center;
+    text-decoration:none;
 }
 
 #btnLogin{
@@ -183,7 +204,6 @@ input[type='text']{
         border: 1px solid #009edb;
         text-align: center;
         text-decoration:none;
-
     }
 }
 /* Phone */

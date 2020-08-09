@@ -4,7 +4,7 @@ require_once 'config.php';
 require_once 'functions.php';
 
 if(!$_SESSION['site_auth'] || !isset($_SESSION['role'])){
-    die(display_logon());
+    display_logon();
 }else{
     $mySforceConnection->login(
         constant($_SESSION['role'] . '_USERNAME'), 
