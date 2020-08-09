@@ -84,7 +84,7 @@ $(document).ready(function(){
         $('#loading_overlay').css('display','block');
         var id = $(this).data('id');
         var location = $(this).data('location');
-        var quant = $('.changeQuant[data-id="' + id + '"]').val();
+        var quant = parseInt($('.changeQuant[data-id="' + id + '"]').val());
         
         $.ajax({
             type: "POST",
@@ -132,9 +132,11 @@ $(document).ready(function(){
 
         var id = $(this).data('id');
         var location = $(this).data('location');
-        var quant = $('.consumeQuant[data-id="' + id + '"]').val();
-        var current = $(this).data('current');
+        var quant = parseInt($('.consumeQuant[data-id="' + id + '"]').val());
+        var current = parseInt($(this).data('current'));
         var jobId = $(this).val();
+
+        //alert('quant: ' + quant + ' \ncurrent: ' + current);
 
         if(quant > current || 0 == quant || '' == quant){
             alert('Deducting too many or none. Refresh page and try again. / Deduzindo muitos ou nenhum. Atualize a página e tente novamente.');
@@ -159,7 +161,7 @@ $(document).ready(function(){
                     type: "POST",
                     url: 'inv-controller.php',
                     data: {
-                        loaction_id: location,
+                        location_id: location,
                         run: 'display-inv'
                     },
                     success: function(response)
