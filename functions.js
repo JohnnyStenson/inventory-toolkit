@@ -199,15 +199,13 @@ $(document).ready(function(){
             success: function(response)
             {
                 document.getElementById("display").innerHTML =response;
-                //document.getElementById("display").show();
                 $('#display').css('display','block');
-                //document.getElementById("menu").hide();
                 $('#menu').css('display','none');
                 $('#menuHidden').css('display','block');
                 document.getElementById("locationName").innerHTML =name;
                 $('#loading_overlay').css('display','none');
-        }
-    });
+            }
+        });
     });
 
     /* Display Location Buttons */
@@ -215,5 +213,6 @@ $(document).ready(function(){
         e.preventDefault();
         $('#menu').css('display','block');
         $('#display').css('display','none');
+        $('#locationName').css('display','none');
     });
 });
