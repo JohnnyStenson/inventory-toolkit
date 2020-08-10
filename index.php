@@ -15,54 +15,56 @@
 </head>
 
 <body>
+    <!-- button onclick="topFunction()" id="btn_top" title="Go to top">Top</!-->
     <div id="loading_overlay"></div>
     <div id="msg"></div>
-<?php
-if(isset($_SESSION['site_auth']) && $_SESSION['site_auth']){
-    echo "
-    <div id='logout'>
-        <a href='logout.php' id='btn_logout'>Logout</a>
-    </div>
-    ";
-}
-?>
-    <div id="google_translate_element"></div>
-    <script>
+    <div id='top'>
+    <?php
+    if(isset($_SESSION['site_auth']) && $_SESSION['site_auth']){
+        echo "
+        <div id='logout'>
+            <a href='logout.php' id='btn_logout'>Logout</a>
+        </div>
+        ";
+    }
+    ?>
+        <div id="google_translate_element"></div>
+        <script>
 
-        function googleTranslateElementInit() {
+            function googleTranslateElementInit() {
 
-            new google.translate.TranslateElement({
+                new google.translate.TranslateElement({
 
-            pageLanguage: 'en'
+                pageLanguage: 'en'
 
-            }, 'google_translate_element');
+                }, 'google_translate_element');
 
-        }
+            }
 
-    </script>
-    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-<?php require 'site-auth.php'; ?>
-    <br class='clear' />
-<?php
-if($_SESSION['site_auth']){
-?>
-    <div id="menuInvItem">
-        <a href='#' id='btn_Menu_inv' class='btn_menuInvItem' data-type='inv'>Inventory</a>
+        </script>
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <?php require 'site-auth.php'; ?>
+        <br class='clear' />
+    <?php
+    if($_SESSION['site_auth']){
+    ?>
+        <div id="menuInvItem">
+            <a href='#' id='btn_Menu_inv' class='btn_menuInvItem' data-type='inv'>Inventory</a>
 
-        <a href='#' id='btn_Menu_item' class='btn_menuInvItem'  data-type='item'>Equipment</a>
-    </div>
-<?php
-}
-?>
+            <a href='#' id='btn_Menu_item' class='btn_menuInvItem'  data-type='item'>Equipment</a>
+        </div>
+    <?php
+    }
+    ?>
 
-    <div id="menu">
-        <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
-    </div>  
-    <div id="menuHidden" style="display:none;">
-        <a id='btnShowLocationButtons' href='#'>Change Location</a>
-        <h2 id="locationName"></h2>
-    </div>
-
+        <div id="menu">
+            <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
+        </div>  
+        <div id="menuHidden" style="display:none;">
+            <a id='btnShowLocationButtons' href='#'>Change Location</a>
+            <h2 id="locationName"></h2>
+        </div>
+    </div> <!-- END #top -->
     
 
     <div id="display"></div>

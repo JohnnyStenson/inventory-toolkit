@@ -52,10 +52,17 @@
                 });
 
                 $image->save('uploads/'.$newFileName, 60);
-                                
-                if(update_img_url($mySforceConnection, $_POST['id'], $newFileName)){
-                    echo "<a href='https://lightning.thunderroadinc.com/inventory/index.php' style='font-size:30px; margin:50px; padding:20px;display:block; border:5px solid black; color:black; text-align:center; text-decoration:none; '>Go Back</a>";
-                }
+				
+
+				if('item' == $_POST['type']){
+					if(update_img_url_item($mySforceConnection, $_POST['id'], $newFileName)){
+						echo "<a href='https://lightning.thunderroadinc.com/inventory/index.php' style='font-size:30px; margin:50px; padding:20px;display:block; border:5px solid black; color:black; text-align:center; text-decoration:none; '>Go Back</a>";
+					}
+				}else{
+					if(update_img_url($mySforceConnection, $_POST['id'], $newFileName)){
+						echo "<a href='https://lightning.thunderroadinc.com/inventory/index.php' style='font-size:30px; margin:50px; padding:20px;display:block; border:5px solid black; color:black; text-align:center; text-decoration:none; '>Go Back</a>";
+					}
+				}
 			}
 		}
 
@@ -66,6 +73,22 @@
 			}
 		}		
 	}
+
+function update_img_url_item($mySforceConnection, $id, $newFileName){
+	$records[0] = new SObject();
+	$records[0]->Id = $id;
+	$records[0]->fields = array(
+		'Image_for_ListView__c' => 'https://lightning.thunderroadinc.com/inventory/uploads/' . $newFileName,
+	);
+	$records[0]->type = 'TrackIT__Item__c';
+
+	$response = $mySforceConnection->update($records);
+	foreach ($response as $result) {
+		echo $result->id . " updated<br/>\n";
+		echo "<img src='https://lightning.thunderroadinc.com/inventory/uploads/" . $newFileName . "' /><br />";
+	}
+	return true;
+}
 
 function update_img_url($mySforceConnection, $id, $newFileName){
     $records[0] = new SObject();

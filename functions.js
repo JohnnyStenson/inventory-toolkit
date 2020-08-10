@@ -175,6 +175,29 @@ $(document).ready(function(){
     });
 
 
+    /* Move Item */
+    $('#display').delegate('.moveItemLocation', 'change', function(e) {
+
+        var id = $(this).data('id');
+        var locId = $(this).val();
+        $('#loading_overlay').css('display','block');
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'move-item',
+                id: id, 
+                new_loc_id: locId
+            },
+            success: function(response)
+            {
+                alert('Moved');
+                display_records();
+            }
+        });
+    });
+
+
     /* Location Buttons */
     $('.btnLocation').on('click', function(e) {
         e.preventDefault();
@@ -225,4 +248,33 @@ function display_records(){
             $('#loading_overlay').css('display','none');
         }
     });
+
+    
 }
+
+/**
+ * BEGIN: Scroll to Top Button
+ 
+
+var btn_top = document.getElementById("btn_top");
+alert()
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function(btn_top) {
+    var style_top = getComputedStyle(btn_top);
+    alert(style_top.height)
+    scrollFunction(style_top.height)
+};
+
+function scrollFunction(height_top) {
+if (document.body.scrollTop > height_top || document.documentElement.scrollTop > height_top) {
+    btn_top.style.display = "block";
+} else {
+    btn_top.style.display = "none";
+}
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+document.body.scrollTop = 0;
+document.documentElement.scrollTop = 0;
+}*/
