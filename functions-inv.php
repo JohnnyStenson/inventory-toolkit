@@ -358,7 +358,7 @@ function display_inventory($mySforceConnection, $response, $location){
 ?>
             <a href='#' 
                 class='btn_unassignLocation blue_button' 
-                data-id='<?php echo $$sf->Id; ?>' >
+                data-loi='<?php echo $sObject->Id; ?>' >
                 Unassign This Location
             </a>
 <?php 
