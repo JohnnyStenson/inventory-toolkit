@@ -150,7 +150,7 @@ input[type='text']{
     font-size:30px;
     text-align:center;
 }
-.consumeQuant, .inv_quantity, .changeQuant, .changeDescription, .changeItemAltDescription{
+.consumeQuant, .inv_quantity, .changeQuant, .changeDescription, .changeItemAltDescription, .input_text{
     font-size:20px; 
     padding:10px; 
     display:block;
@@ -165,20 +165,33 @@ input[type='text']{
     margin: 20px auto;
     padding:20px;
 }
-.moveItemLocation{
+.moveItemLocation, .input_select{
     margin: 20px auto;
     padding:20px;
 }
 .admin_drawer{
     display:none;
     margin:20px auto;
+    padding-top: 20px;
+    border-top: 1px solid black;
+}
+
+.btn_red_outline{
+    font-size: 20px;
+    line-height: 20px;
+    display: block;
+    margin: 10px;
+    color: orange;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid orange;
+    text-align: center;
+    text-decoration:none;
 }
 
 /* Tablet */
 @media only screen and (max-width: 1000px) {
-    .btnLocation{
-        padding:30px 10px;
-    }
     .inv_record{
         display:block;
         text-align:center;
@@ -235,7 +248,7 @@ input[type='text']{
         font-size:20px; 
         display: inline-block; 
     }
-    .btn_changeQuant, .btn_OpenSFApp, .btn_AssignToLocation, .btn_changeDescription{
+    .blue_button, .btn_changeQuant, .btn_OpenSFApp, .btn_AssignToLocation, .btn_changeDescription{
         font-size: 30px;
         line-height: 30px;
         display: block;
@@ -261,7 +274,7 @@ input[type='text']{
     .inv_quantity, .lbl_consumeJob{
         font-size:20px;
     }
-    .consumeQuant, .consumeJob, .changeQuant, .changeDescription, .moveItemLocation{
+    .consumeQuant, .consumeJob, .changeQuant, .changeDescription, .moveItemLocation, .input_select, .input_text{
         width:200px;
         box-sizing:border-box;
         -moz-box-sizing: border-box;
@@ -275,7 +288,7 @@ input[type='text']{
     .frmReplacePicture{
         width:200px;
     }
-    .btn_changeQuant, .btn_OpenSFApp, .btn_AssignToLocation, .btn_changeDescription{
+    .blue_button, .btn_changeQuant, .btn_OpenSFApp, .btn_AssignToLocation, .btn_changeDescription{
         font-size: 20px;
         line-height: 20px;
     }

@@ -7,7 +7,24 @@ function update_item_location($mySforceConnection, $item_id, $new_loc_id){
     $records[0] = new SObject();
 	$records[0]->Id = $item_id;
 	$records[0]->fields = array(
-    	'TrackIT__Location__c' => $new_loc_id,
+        'TrackIT__Location__c' => $new_loc_id,
+        'Temporary_Location__c' => 'true'
+	);
+	$records[0]->type = 'TrackIT__Item__c';
+
+	$response = $mySforceConnection->update($records);
+}
+
+
+/**
+ * 
+ */
+function keep_item_location($mySforceConnection, $item_id){
+    $records[0] = new SObject();
+	$records[0]->Id = $item_id;
+	$records[0]->fields = array(
+        'Temporary_Location__c
+        ' => 'false'
 	);
 	$records[0]->type = 'TrackIT__Item__c';
 
@@ -22,11 +39,11 @@ function update_item_location($mySforceConnection, $item_id, $new_loc_id){
 /* Query Items by Location */
 function query_item_by_location($mySforceConnection, $location_id){
     if($location_id == 'all'){
-        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, Alternate_Description__c, TrackIT__Location__c 
+        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, Alternate_Description__c, TrackIT__Location__c, TrackIT__Location__r.Name, Temporary_Location__c
             FROM TrackIT__Item__c 
             WHERE isDeleted = false";
     }else{
-        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, Alternate_Description__c, TrackIT__Location__c 
+        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, Alternate_Description__c, TrackIT__Location__c, TrackIT__Location__r.Name, Temporary_Location__c
             FROM TrackIT__Item__c 
             WHERE TrackIT__Location__c = '" . $location_id . "'
             AND isDeleted = false";
@@ -62,10 +79,16 @@ function display_items($mySforceConnection, $response, $location){
 
     foreach ($response as $record) {
         $sObject = new SObject($record);
+        $sObject_Location = new SObject($sObject->fields->TrackIT__Location__r);
         $sf = 'sObject'; // Dynamic Variable
 
-        echo "<div class='inv_record'>"; // BEGIN div.inv_record
+        //print_r($$sf->fields);
+        /* 
+        stdClass Object ( [Name] => 0122780 [Id] => a3T1U000000dGMyUAM [Image_for_ListView__c] => https://lightning.thunderroadinc.com/inventory/uploads/20200806_173602.jpg [TrackIT__Description__c] => SDS Max Demolition Hammer [Alternate_Description__c] => [TrackIT__Location__c] => a3W1U000000ith2UAA [TrackIT__Location__r] => SObject Object ( [type] => TrackIT__Location__c [fields] => stdClass Object ( [Name] => TR020 Blue F250 Utitlity ) ) )
+        */
 
+        echo "<div class='inv_record'>"; // BEGIN div.inv_record
+        
         echo "<div class='inv_name'>" . $$sf->fields->TrackIT__Description__c . "</div>";
         if(!empty($$sf->fields->Alternate_Description__c)){
             echo "<div class='inv_name'>" . $$sf->fields->Alternate_Description__c . "</div>";
@@ -75,15 +98,36 @@ function display_items($mySforceConnection, $response, $location){
 
         echo "<div class='inv_quantity'> ID #: " . $sObject->fields->Name . "</div>";
 
+        // Location
+        if('true' == $$sf->fields->Temporary_Location__c
+        ){
+        ?>
+            <a class='btn_red_outline<?php echo ('MNGR' == $_SESSION['role']) ? " btn_keepitemlocation' href='#'"  : "'";  ?> data-id='<?php echo $$sf->Id; ?>'>Temporary <?php echo ('MNGR' == $_SESSION['role']) ? ' <br />(Click to Keep)' : '';  ?></a>
+        <?php 
+        }
+        ?>
+        <!-- BEGIN Change location -->
+        <label style='font-size:20px;' class='hideRepReq' data-id='<?php echo $$sf->Id; ?>'>Move from: </label><br />
+        <select class='moveItemLocation hideRepReq' data-id='<?php echo $$sf->Id; ?>' >
+            <option value='0'><?php echo $sObject_Location->fields->Name; ?></option>
+            <?php echo  $ploLocs ?>
+        </select>
+        <!-- END Change location -->
+
+        <!-- BEGIN Repair Request -->
+        <a style='display:block;' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'><img src='img_assets/icon_request_repair.jpg' /></a>
+        <!-- END Repair Request -->
+        
+        <?php
         if('CREW' != $_SESSION['role']){
 ?>
         <div class='openDrawerBtns' data-id='<?php echo $$sf->Id; ?>'>
-            <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>A</a>
-            <a href='#' class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</a>
+            <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</a>
+            <!-- a href='#' class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>?</!-->
         </div>
         <div class='admin_drawer' data-id='<?php echo $$sf->Id; ?>'>
             
-            <!-- BEGIN Change description -->
+            <!-- BEGIN Change description
             <input type='text' 
                 class='changeItemAltDescription' 
                 data-id='<?php echo $$sf->Id; ?>' 
@@ -94,15 +138,10 @@ function display_items($mySforceConnection, $response, $location){
                 style='display:none;' 
                 data-id='<?php echo $$sf->Id; ?>'>
                 Change Alt Description
-            </a><br />
+            </a><br />-->
             <!-- END Change description -->
 
-            <!-- BEGIN Change location -->
-            <select class='moveItemLocation' data-id='<?php echo $$sf->Id; ?>' >
-                <option value='0'>Move to:</option>" .
-                <?php echo  $ploLocs ?>
-            </select>
-            <!-- END Change location -->
+            
 
             <a class='btn_OpenSFApp' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'>Open in Salesforce App</a>
 

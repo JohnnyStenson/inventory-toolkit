@@ -66,3 +66,16 @@ function main_query($mySforceConnection, $location_id, $type){
         break;    
     };
 }
+
+
+/**
+ * 
+ */
+function write_file_to_server($records, $filename){
+    $handle = fopen($filename, "w");
+    foreach ((array) $records as $record) {
+        $strLine = implode('| ', $record) . PHP_EOL;
+        fwrite($handle, $strLine);
+    }
+    fclose($handle);
+}

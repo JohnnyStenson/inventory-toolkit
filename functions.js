@@ -197,8 +197,15 @@ $(document).ready(function(){
         });
     });
 
+    
 
     /* Location Buttons */
+    $('#btnShowLocationButtons').on('click', function(e) {
+        e.preventDefault();
+        $('#menu').css('display','block');
+        $('#display').css('display','none');
+        $('#locationName').css('display','none');
+    });
     $('.btnLocation').on('click', function(e) {
         e.preventDefault();
         $('#loading_overlay').css('display','block');
@@ -209,6 +216,7 @@ $(document).ready(function(){
             url: 'inv-controller.php',
             data: {
                 location_id: location_id,
+                location_name: name,
                 run: 'set_location_id'
             },
             success: function(response)
@@ -219,17 +227,130 @@ $(document).ready(function(){
             }
         });
     });
+    
 
+    /**
+     * Keep Item Location
+     */
+    $('#display').delegate('.btn_keepitemlocation', 'click', function(e) {
 
-    /* Display Location Buttons */
-    $('#btnShowLocationButtons').on('click', function(e) {
-        e.preventDefault();
-        $('#menu').css('display','block');
-        $('#display').css('display','none');
-        $('#locationName').css('display','none');
+        var id = $(this).data('id');
+        $('#loading_overlay').css('display','block');
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'keep-item-location',
+                id: id, 
+            },
+            success: function(response)
+            {
+                alert('Kept');
+                display_records();
+            }
+        });
     });
 
-    
+
+    /**
+     * Keep Inventory Location
+     */
+    $('#display').delegate('.btn_keepinvlocation', 'click', function(e) {
+        var loi_id = $(this).data('loi');
+        $('#loading_overlay').css('display','block');
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'keep-inv-location',
+                loi_id: loi_id
+            },
+            success: function(response)
+            {
+                alert('Kept');
+                display_records();
+            }
+        });
+    });
+
+
+    /**
+     * 
+     */
+    $('#display').delegate('.btn_unassignLocation', 'click', function(e) {
+        var loi_id = $(this).data('loi');
+        $('#loading_overlay').css('display','block');
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'unassign-inv-location',
+                loi_id: loi_id
+            },
+            success: function(response)
+            {
+                alert('Unassigned');
+                display_records();
+            }
+        });
+    });
+
+    /**
+     * Assign Inv to Location for All
+     */
+    //Get Locations not assigned to
+    $('#display').delegate('.btn_assign2newlocation', 'click', function(e) {
+        e.preventDefault();
+        var inv_id = $(this).data('id');
+        $('.hide_assign2location[data-id="' + inv_id + '"]').css('display','none');
+        $('#loading_overlay').css('display','block');
+
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'nonassigned-inv-locations',
+                inv_id: inv_id
+            },
+            success: function(response)
+            {
+                //alert(response);
+                $('.select_assign2location[data-id="' + inv_id + '"]').html(response);
+                $('.frm_assign2location[data-id="' + inv_id + '"]').css('display','block');
+                $('#loading_overlay').css('display','none');
+            }
+        });
+    });
+    $('#display').delegate('.select_assign2location', 'change', function(e) {
+        var inv_id = $(this).data('id');
+        var assign_id = $('.select_assign2location[data-id="' + inv_id + '"]').val();
+        var quant = parseInt($('.assign_quant[data-id="' + inv_id + '"]').val());
+        var restock = parseInt($('.assign_restock[data-id="' + inv_id + '"]').val());
+        var optimal = parseInt($('.assign_optimal[data-id="' + inv_id + '"]').val());
+        var max = parseInt($('.assign_max[data-id="' + inv_id + '"]').val());
+
+        $('#loading_overlay').css('display','block');
+
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'assign-inv-location',
+                inv_id: inv_id,
+                assign_id: assign_id,
+                quant: quant,
+                restock: restock,
+                optimal: optimal,
+                max: max
+            },
+            success: function(response)
+            {
+                alert('Assigned');
+                display_records();
+            }
+        });
+    });
+
 });
 
 function display_records(){
