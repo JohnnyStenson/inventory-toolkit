@@ -6,6 +6,9 @@ switch($_POST['run']){
     case "nonassigned-inv-locations":
         nonassigned_inv_locations($mySforceConnection, $_POST['inv_id']);
     break;
+    case "temp-move-inv-location":
+        temp_move_inv_location($mySforceConnection, $_POST['inv_id'], $_POST['assign_id'], $_POST['quant']);
+    break;
     case "assign-inv-location":
         assign_inv_location($mySforceConnection, $_POST['inv_id'], $_POST['assign_id'], $_POST['quant'], $_POST['restock'], $_POST['optimal'], $_POST['max']);
     break;

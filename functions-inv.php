@@ -105,6 +105,28 @@ function assign_inv_location($mySforceConnection, $inv_id, $assign_id, $quant, $
 /**
  * 
  */
+function temp_move_inv_location($mySforceConnection, $inv_id, $assign_id, $quant){
+    $records = array();
+
+    $records[0] = new SObject();
+    $records[0]->fields = array(
+        'TrackIT__Inventory__c' => $inv_id,
+        'TrackIT__Location__c' => $assign_id,
+        'TrackIT__Quantity__c' => $quant,
+        'Restock_Point__c' => 0,
+        'Optimal_Quantity__c' => 0,
+        'Max_Storage_Capacity__c' => 0,
+        'Temporary_Location__c' => 'true'
+    );
+    $records[0]->type = 'TrackIT__Inv_Location__c';
+
+    $response = $mySforceConnection->create($records);
+}
+
+
+/**
+ * 
+ */
 function nonassigned_inv_locations($mySforceConnection, $inv_id){
     //get locations it is assigned to
     $query_assignedlocations = "SELECT Id, TrackIT__Location__r.Id, TrackIT__Location__r.Name
@@ -251,7 +273,7 @@ function display_inventory($mySforceConnection, $response, $location){
         if('all' != $location && 'true' == $sObject->fields->Temporary_Location__c
         ){
         ?>
-            <a class='btn_red_outline<?php echo ('MNGR' == $_SESSION['role']) ? " btn_keepinvlocation' href='#'"  : "'";  ?> data-id='<?php echo $$sf->Id; ?>' data-loi='<?php echo $sObject->Id; ?>'>Temporary <?php echo ('MNGR' == $_SESSION['role']) ? ' <br />(Click to Keep)' : '';  ?></a>
+            <a class='btn_red_outline<?php echo ('MNGR' == $_SESSION['role']) ? " btn_keepinvlocation' href='#'"  : "'";  ?> data-id='<?php echo $$sf->Id; ?>' data-loi='<?php echo $sObject->Id; ?>'>Temporary <?php echo ('MNGR' == $_SESSION['role']) ? ' <br />(Click to Keep or<br /> Unassign Below)' : '';  ?></a>
         <?php 
         }
 
@@ -347,10 +369,20 @@ function display_inventory($mySforceConnection, $response, $location){
 
 
             <a href='#' 
-                class='btn_MoveToLocationTemp blue_button hide_assign2location' 
+                class='btn_movetemplocation blue_button hide_assign2location' 
                 data-id='<?php echo $$sf->Id; ?>' >
                 Move to a Location Temporarily
             </a>
+            <div class='frm_movetemplocation' data-id='<?php echo $$sf->Id; ?>' style='display:none; border-bottom:1px solid black;'>
+                
+                <input type='text' 
+                    class='assign_movetemplocation input_text' 
+                    data-id='<?php echo $$sf->Id; ?>' placeholder='Quantity'
+                />
+
+                <select class="select_movetemplocation input_select" data-id="<?php echo $$sf->Id; ?>">
+                </select>
+            </div>
             
 
 <?php

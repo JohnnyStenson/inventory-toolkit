@@ -278,6 +278,7 @@ $(document).ready(function(){
      * 
      */
     $('#display').delegate('.btn_unassignLocation', 'click', function(e) {
+        e.preventDefault();
         var loi_id = $(this).data('loi');
         $('#loading_overlay').css('display','block');
         $.ajax({
@@ -351,6 +352,57 @@ $(document).ready(function(){
         });
     });
 
+
+    /**
+     * Move Inv to Location Temporarily for All
+     */
+    //Get Locations not assigned to
+    $('#display').delegate('.btn_movetemplocation', 'click', function(e) {
+        e.preventDefault();
+        var inv_id = $(this).data('id');
+        $('.hide_assign2location[data-id="' + inv_id + '"]').css('display','none');
+        $('#loading_overlay').css('display','block');
+
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'nonassigned-inv-locations',
+                inv_id: inv_id
+            },
+            success: function(response)
+            {
+                //alert(response);
+                $('.select_movetemplocation[data-id="' + inv_id + '"]').html(response);
+                $('.frm_movetemplocation[data-id="' + inv_id + '"]').css('display','block');
+                $('#loading_overlay').css('display','none');
+            }
+        });
+    });
+    $('#display').delegate('.select_movetemplocation', 'change', function(e) {
+        var inv_id = $(this).data('id');
+        var assign_id = $('.select_movetemplocation[data-id="' + inv_id + '"]').val();
+        var quant = parseInt($('.assign_movetemplocation[data-id="' + inv_id + '"]').val());
+
+
+        $('#loading_overlay').css('display','block');
+
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'temp-move-inv-location',
+                inv_id: inv_id,
+                assign_id: assign_id,
+                quant: quant,
+            },
+            success: function(response)
+            {
+                alert('Assigned Temporarily');
+                display_records();
+            }
+        });
+    });
 });
 
 function display_records(){
