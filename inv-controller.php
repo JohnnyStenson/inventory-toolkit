@@ -43,7 +43,7 @@ switch($_POST['run']){
         update_item_location($mySforceConnection, $_POST['id'], $_POST['new_loc_id']);
     break;
     case "changeQuant-inv":
-        change_quantity_location_of_inventory($mySforceConnection, $_POST['id'], $_SESSION['location_id'], $_POST['quant']);
+        change_quantity_location_of_inventory($mySforceConnection, $_POST['id'], $_SESSION['location_id'], $_POST['quant'], $_POST['restock'], $_POST['optimal'], $_POST['max_quant']);
     break;
     case "changeDescription-inv":
         change_descrption_of_inventory($mySforceConnection, $_POST['id'], $_POST['descr']);

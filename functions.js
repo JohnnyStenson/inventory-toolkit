@@ -81,7 +81,9 @@ $(document).ready(function(){
     $('#display').delegate('.changeDescription', 'click', function(e) {
         var id = $(this).data('id');
         $('.btn_changeDescription[data-id="' + id + '"]').css('display', 'block');
+        $('.hide_changeDescription[data-id="' + id + '"]').css('display', 'none');
     });
+
     $('#display').delegate('.btn_changeDescription', 'click', function(e) {
         e.preventDefault();
         $('#loading_overlay').css('display','block');
@@ -107,16 +109,21 @@ $(document).ready(function(){
 
 
     /* Change Quantity */
-    $('#display').delegate('.changeQuant', 'click', function(e) {
+    $('#display').delegate('.btn_displaychangequants', 'click', function(e) {
+        e.preventDefault();
         var id = $(this).data('id');
-        $('.btn_changeQuant[data-id="' + id + '"]').css('display', 'block');
+        $('.frm_changequants[data-id="' + id + '"]').css('display', 'block');
+        $('.hide_changequants[data-id="' + id + '"]').css('display', 'none');
     });
-    $('#display').delegate('.btn_changeQuant', 'click', function(e) {
+    $('#display').delegate('.btn_changequants', 'click', function(e) {
         e.preventDefault();
         $('#loading_overlay').css('display','block');
         var id = $(this).data('id');
         var location = $(this).data('location');
-        var quant = parseInt($('.changeQuant[data-id="' + id + '"]').val());
+        var quant = parseInt($('.quant_changequants[data-id="' + id + '"]').val());
+        var restock = parseInt($('.restock_changequants[data-id="' + id + '"]').val());
+        var optimal = parseInt($('.optimal_changequants[data-id="' + id + '"]').val());
+        var max_quant = parseInt($('.max_changequants[data-id="' + id + '"]').val());
         
         $.ajax({
             type: "POST",
@@ -125,7 +132,10 @@ $(document).ready(function(){
                 run: 'changeQuant-inv',
                 id: id, 
                 location: location,
-                quant: quant
+                quant: quant,
+                restock: restock,
+                optimal: optimal,
+                max_quant: max_quant
             },
             success: function(response)
             {

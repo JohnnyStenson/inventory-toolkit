@@ -190,6 +190,8 @@ input[type='text']{
     text-decoration:none;
 }
 
+
+
 /* Tablet */
 @media only screen and (max-width: 1000px) {
     .inv_record{
@@ -261,6 +263,16 @@ input[type='text']{
         text-align: center;
         text-decoration:none;
     }
+    .table_quants{
+        border-collapse: collapse;
+        width:400px;
+        margin:0 auto;
+    }
+    .table_quants td{
+        text-align:left;
+        padding-right:20px;
+        padding-left:10px;
+    }
 }
 /* Phone */
 @media only screen and (max-width: 600px) {
@@ -291,5 +303,13 @@ input[type='text']{
     .blue_button, .btn_changeQuant, .btn_OpenSFApp, .btn_AssignToLocation, .btn_changeDescription{
         font-size: 20px;
         line-height: 20px;
+    }
+    .table_quants{
+        width:250px;
+    }
+    .table_quants td{
+        text-align:left;
+        padding-right:20px;
+        padding-left:10px;
     }
 }

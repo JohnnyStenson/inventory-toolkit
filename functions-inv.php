@@ -15,7 +15,7 @@ function change_description_of_inventory($mySforceConnection, $id, $descr){
 /**
  * 
  */
-function change_quantity_location_of_inventory($mySforceConnection, $inv_id, $location_id, $quant ){
+function change_quantity_location_of_inventory($mySforceConnection, $inv_id, $location_id, $quant, $restock, $optimal, $max_quant ){
     // get TrackIT__Inv_Location__c.Id 
     $query = "SELECT Id FROM TrackIT__Inv_Location__c WHERE TrackIT__Inventory__c='" . $inv_id . "' AND TrackIT__Location__c='" . $location_id . "'";
 
@@ -28,7 +28,10 @@ function change_quantity_location_of_inventory($mySforceConnection, $inv_id, $lo
     $records[0] = new SObject();
 	$records[0]->Id = $sObject->Id;
 	$records[0]->fields = array(
-    	'TrackIT__Quantity__c' => $quant,
+        'TrackIT__Quantity__c' => $quant,
+        'Restock_Point__c' => $restock,
+        'Optimal_Quantity__c' => $optimal,
+        'Max_Storage_Capacity__c' => $max_quant,
 	);
 	$records[0]->type = 'TrackIT__Inv_Location__c';
 
@@ -173,7 +176,7 @@ function query_inv_by_location($mySforceConnection, $location_id){
             FROM TrackIT__Inventory__c 
             WHERE isDeleted = false";
     }else{
-        $query = "SELECT Id, TrackIT__Quantity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c
+        $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c
             FROM TrackIT__Inv_Location__c 
             WHERE TrackIT__Location__c = '" . $location_id . "'
             AND isDeleted = false";
@@ -277,7 +280,17 @@ function display_inventory($mySforceConnection, $response, $location){
         <?php 
         }
 
-        echo "<div class='inv_quantity'> Current Quantity: " . (('all' != $location) ? $sObject->fields->TrackIT__Quantity__c : $sObject->fields->TrackIT__Total_Quantity__c ) . "</div>";
+        // Quantities
+        echo "<div class='inv_quantity'><table class='table_quants'>";
+        if('all' != $location){
+            echo "<tr style='border:1px solid black;'><td>Current Quantity: </td><td>" . $sObject->fields->TrackIT__Quantity__c . "</td></tr>";
+            echo "<tr><td>Restock Point: </td><td>" . $sObject->fields->Restock_Point__c . "</td></tr>";
+            echo "<tr><td>Optimal Quantity: </td><td>" . $sObject->fields->Optimal_Quantity__c . "</td></tr>";
+            echo "<tr><td>Max Quantity: </td><td>" . $sObject->fields->Max_Storage_Capacity__c . "</td></tr>";
+        }else{
+            echo "Total Quantity: " . $sObject->fields->TrackIT__Total_Quantity__c;
+        }
+        echo "</table></div>";
 
         if('all' != $location){
             echo "<div class='inv_use'>
@@ -305,7 +318,7 @@ function display_inventory($mySforceConnection, $response, $location){
             
             <!-- BEGIN Change description -->
             <input type='text' 
-                class='changeDescription hide_assign2location' 
+                class='changeDescription hide_assign2location hide_changequants' 
                 data-id='<?php echo $$sf->Id; ?>' 
                 placeholder='Change Description'
             />
@@ -321,17 +334,36 @@ function display_inventory($mySforceConnection, $response, $location){
 <?php
     if('all' != $location){ // BEGIN allow quant change
 ?>
-            <input type='text' 
-                class='changeQuant' 
-                data-id='<?php echo $$sf->Id; ?>' placeholder='Change Quantity'
-            />
             <a href='#' 
-                class='btn_changeQuant'
-                style='display:none;' 
+                class='btn_displaychangequants blue_button hide_changequants hide_changeDescription'
                 data-id='<?php echo $$sf->Id; ?>' 
                 data-location='<?php echo $location; ?>'>
-                Change Quantity
+                Change Quantities
             </a>
+            <div class='frm_changequants' style='display:none; border-bottom:1px solid black;' data-id='<?php echo $$sf->Id; ?>'>
+                <input type='text' 
+                    class='quant_changequants input_text' 
+                    data-id='<?php echo $$sf->Id; ?>' placeholder='Current Quantity'
+                />
+                <input type='text' 
+                    class='restock_changequants input_text' 
+                    data-id='<?php echo $$sf->Id; ?>' placeholder='Restock Point'
+                />
+                <input type='text' 
+                    class='optimal_changequants input_text' 
+                    data-id='<?php echo $$sf->Id; ?>' placeholder='Optimal Quantity'
+                />
+                <input type='text' 
+                    class='max_changequants input_text' 
+                    data-id='<?php echo $$sf->Id; ?>' placeholder='Max Quantity'
+                />
+                <a href='#' 
+                class='btn_changequants blue_button'
+                data-id='<?php echo $$sf->Id; ?>' 
+                data-location='<?php echo $location; ?>'>
+                Save Quantities
+            </a>
+            </div>
 <?php
     } // END allow quant change
 
@@ -339,7 +371,7 @@ function display_inventory($mySforceConnection, $response, $location){
 ?>
             
             <a href='#' 
-                class='btn_assign2newlocation blue_button hide_assign2location' 
+                class='btn_assign2newlocation blue_button hide_assign2location hide_changeDescription' 
                 data-id='<?php echo $$sf->Id; ?>' >
                 Assign to a New Location
             </a>
@@ -369,7 +401,7 @@ function display_inventory($mySforceConnection, $response, $location){
 
 
             <a href='#' 
-                class='btn_movetemplocation blue_button hide_assign2location' 
+                class='btn_movetemplocation blue_button hide_assign2location hide_changeDescription' 
                 data-id='<?php echo $$sf->Id; ?>' >
                 Move to a Location Temporarily
             </a>
@@ -389,8 +421,9 @@ function display_inventory($mySforceConnection, $response, $location){
     }else{
 ?>
             <a href='#' 
-                class='btn_unassignLocation blue_button' 
-                data-loi='<?php echo $sObject->Id; ?>' >
+                class='btn_unassignLocation blue_button hide_changequants hide_changeDescription' 
+                data-loi='<?php echo $sObject->Id; ?>' 
+                data-id="<?php echo $$sf->Id; ?>">
                 Unassign This Location
             </a>
 <?php 
