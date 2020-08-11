@@ -42,10 +42,8 @@ switch($_POST['run']){
             main_query($mySforceConnection, $_SESSION['location_id'], $_SESSION['inv_item']);
         }
     break;
-    case "display-fulfillment":
-        if(isset($_SESSION['location_id'])){
-            query_fulfillment($mySforceConnection, $_SESSION['location_id']);
-        }
+    case "toggle-fulfillment":
+        $_SESSION['fulfillment'] = filter_var($_POST['fulfillment'], FILTER_SANITIZE_STRING);
     break;
     case "use-inv":
         deduct_inv_from_location($mySforceConnection, $_POST['id'], $_SESSION['location_id'], $_POST['jobId'], $_POST['quant']);

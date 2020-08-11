@@ -289,7 +289,7 @@ function display_inventory($mySforceConnection, $response, $location){
         //echo "<div class='inv_barcode'><img src='".get_inventory_barcode($record['Name'])."' /></div>";
         //echo "<a class='inv_button' href='https://thundernj.lightning.force.com/lightning/r/TrackIT__Inventory__c/".$record['Id']."/view?iospref=web'>Web</a>";
 
-        if('CREW' != $_SESSION['role']){
+        if('CREW' != $_SESSION['role']){ // BEGIN drawer
 ?>
         <div class='openDrawerBtns' data-id='<?php echo $$sf->Id; ?>'>
             <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</a>
@@ -313,7 +313,7 @@ function display_inventory($mySforceConnection, $response, $location){
             <!-- END Change description -->
 
 <?php
-    if('all' != $location){ // BEGIN allow quant change
+            if('all' != $location){ // BEGIN allow quant change
 ?>
             <a href='#' 
                 class='btn_displaychangequants blue_button hide_changequants hide_changeDescription'
@@ -346,9 +346,9 @@ function display_inventory($mySforceConnection, $response, $location){
             </a>
             </div>
 <?php
-    } // END allow quant change
+            } // END allow quant change
 
-    if('all' == $location){ // BEGIN assign to a location
+            if('all' == $location){ // BEGIN assign to a location
 ?>
             
             <a href='#' 
@@ -399,7 +399,7 @@ function display_inventory($mySforceConnection, $response, $location){
             
 
 <?php
-    }else{
+            }else{
 ?>
             <a href='#' 
                 class='btn_unassignLocation blue_button hide_changequants hide_changeDescription' 
@@ -408,7 +408,7 @@ function display_inventory($mySforceConnection, $response, $location){
                 Unassign This Location
             </a>
 <?php 
-    } // END assign to a location
+            } // END assign to a location
 ?>
             <a class='btn_OpenSFApp' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'>Open in Salesforce App</a>
 
@@ -428,7 +428,7 @@ function display_inventory($mySforceConnection, $response, $location){
         </div> <!-- END .admin_drawer -->
         
 <?php
-    }
+        } // END drawer
         echo "</div>"; // END div.inv_record
     }
 }
