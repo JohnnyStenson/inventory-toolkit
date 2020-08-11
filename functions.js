@@ -1,4 +1,18 @@
+$(window).on("unload", function(){   
+    $.ajax({
+        type: "POST",
+        url: 'inv-controller.php',
+        data: {
+            run: 'clear-session'
+        },
+        success: function(response){
+        }
+    });
+});
+
 $(document).ready(function(){
+    
+
 
     /* get current type (for refresh and init)*/
     if($('#menuInvItem').length) get_inv_item();
@@ -434,14 +448,14 @@ $(document).ready(function(){
             $(this).data('show_hide', 'Hide')
             $('#spShowHideOF').text('Hide');
             $('#btn_Menu_item').css('display', 'none');
-            fulfillment = 'true';
+            fulfillment = 1;
         }else{
             $(this).removeClass('blue_button');
             $(this).addClass('btn_blue_outline');
             $(this).data('show_hide', 'Show')
             $('#spShowHideOF').text('Show');
             $('#btn_Menu_item').css('display', 'inline-block');
-            fulfillment = 'false';
+            fulfillment = 0;
         }
 
         $.ajax({

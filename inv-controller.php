@@ -57,6 +57,12 @@ switch($_POST['run']){
     case "changeDescription-inv":
         change_descrption_of_inventory($mySforceConnection, $_POST['id'], $_POST['descr']);
     break;
+    case "clear-session":
+        $_SESSION['inv_item'] = 'inv';
+        $_SESSION['location_id'] = 'all';
+        $_SESSION['location_name'] = 'All Inventory';
+        unset($_SESSION['fulfillment']);
+    break;
     default:
         die('error');
 }

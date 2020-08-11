@@ -47,7 +47,7 @@
     ?>
         <br class='clear' />
         <div id="menuInvItem">
-            <a href='#' id='btn_Menu_inv' class='btn_menuInvItem' data-type='inv'>Inventory</a>
+            <a href='#' id='btn_Menu_inv' class='btn_menuInvItem btn_menuInvItem_selected' data-type='inv'>Inventory</a>
 
             <a href='#' id='btn_Menu_item' class='btn_menuInvItem'  data-type='item'>Equipment</a>
         </div>
