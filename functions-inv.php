@@ -209,25 +209,6 @@ function display_inventory($mySforceConnection, $response, $location){
     }
 
     foreach ($response as $record) {
-        /*
-        SObject Object ( 
-            [type] => TrackIT__Inv_Location__c 
-            [fields] => stdClass Object ( 
-                [TrackIT__Quantity__c] => 1.0 
-                [TrackIT__Inventory__r] => SObject Object ( 
-                    [type] => TrackIT__Inventory__c 
-                    [fields] => stdClass Object ( 
-                        [Name] => Jumper Cables 2 Guage 20 
-                        [Id] => a3S1U000000ifX2UAI 
-                        [Image_for_ListView__c] => https://www.harborfreight.com/media/catalog/product/cache/0/image/200x/9df78eab33525d08d6e5fb8d27136e95/i/m/image_21635.jpg 
-                        [TrackIT__Description__c] => 
-                    ) 
-                    [Id] => a3S1U000000ifX2UAI 
-                ) 
-            ) 
-        )
-        */
-
         $suffix = '';
         $sObject = new SObject($record);
         if('all' !== $location){
@@ -236,7 +217,7 @@ function display_inventory($mySforceConnection, $response, $location){
         }
         $sf = 'sObject'.$suffix; // Dynamic Variable
         //print_r($sObject->Id);
-        print_r($sObject->fields);
+        //print_r($sObject->fields);
         /*
         stdClass Object ( 
             [TrackIT__Quantity__c] => 1.0 
@@ -253,7 +234,7 @@ function display_inventory($mySforceConnection, $response, $location){
             ) 
         )
         */
-        if(isset($sObject2)) print_r($sObject2->fields);
+        //if(isset($sObject2)) print_r($sObject2->fields);
         /*
         stdClass Object ( 
             [Name] => Jumper Cables 2 Guage 20' 
