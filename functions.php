@@ -6,6 +6,7 @@ if(!isset($_SESSION)) session_start();
 
 require_once 'functions-inv.php';
 require_once 'functions-item.php';
+require_once 'functions-fulfillment.php';
 
 function display_logon(){
 ?>

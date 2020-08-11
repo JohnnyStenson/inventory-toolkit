@@ -27,7 +27,13 @@ $(document).ready(function(){
         e.preventDefault();
         $('#loading_overlay').css('display','block');
         var inv_item = $(this).data('type');
-        
+
+        if('inv' == inv_item){
+            $('#btnShowHideOF').css('display', 'block');
+        }else{
+            $('#btnShowHideOF').css('display', 'none');
+        }
+
         $.ajax({
             type: "POST",
             url: 'inv-controller.php',
@@ -214,13 +220,14 @@ $(document).ready(function(){
         e.preventDefault();
         $('#menu').css('display','block');
         $('#display').css('display','none');
-        $('#locationName').css('display','none');
+        $('#menuHidden').css('display','none');
     });
     $('.btnLocation').on('click', function(e) {
         e.preventDefault();
         $('#loading_overlay').css('display','block');
         var location_id = $(this).data('id');
         var name = $(this).data('name');
+        $('#location_name').text(name);
         $.ajax({
             type: "POST",
             url: 'inv-controller.php',
@@ -231,9 +238,7 @@ $(document).ready(function(){
             },
             success: function(response)
             {
-                document.getElementById("locationName").innerHTML =name;
                 display_records();
-
             }
         });
     });
@@ -413,8 +418,41 @@ $(document).ready(function(){
             }
         });
     });
+
+
+    /**
+     * 
+     */
+    $('#btnShowHideOF').on('click', function(e) {
+        e.preventDefault();
+        $('#loading_overlay').css('display','block');
+        var show_hide = $(this).data('show_hide');
+        if('Show' == show_hide){
+            $(this).removeClass('btn_blue_outline');
+            $(this).addClass('blue_button');
+            $(this).data('show_hide', 'Hide')
+            $('#spShowHideOF').text('Hide');
+            $('#btn_Menu_item').css('display', 'none');
+            display_fulfillment();
+        }else{
+            $(this).removeClass('blue_button');
+            $(this).addClass('btn_blue_outline');
+            $(this).data('show_hide', 'Show')
+            $('#spShowHideOF').text('Show');
+            $('#btn_Menu_item').css('display', 'inline-block');
+            display_records();
+        }
+    });
+
+
+
+
 });
 
+
+/**
+ * 
+ */
 function display_records(){
     $.ajax({
         type: "POST",
@@ -431,10 +469,29 @@ function display_records(){
             $('#loading_overlay').css('display','none');
         }
     });
-
-    
 }
 
+
+/**
+ * 
+ */
+function display_fulfillment(){
+    $.ajax({
+        type: "POST",
+        url: 'inv-controller.php',
+        data: {
+            run: 'display-fulfillment'
+        },
+        success: function(response)
+        {
+            document.getElementById("display").innerHTML =response;
+            $('#display').css('display','block');
+            $('#menu').css('display','none');
+            $('#menuHidden').css('display','block');
+            $('#loading_overlay').css('display','none');
+        }
+    });
+}
 /**
  * BEGIN: Scroll to Top Button
  

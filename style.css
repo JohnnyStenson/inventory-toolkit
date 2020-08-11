@@ -190,6 +190,19 @@ input[type='text']{
     text-decoration:none;
 }
 
+.btn_blue_outline{
+    font-size: 20px;
+    line-height: 20px;
+    display: block;
+    margin: 10px;
+    color: #009edb;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #009edb;
+    text-align: center;
+    text-decoration:none;
+}
 
 
 /* Tablet */

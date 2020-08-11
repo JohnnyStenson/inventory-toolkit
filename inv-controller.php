@@ -26,6 +26,7 @@ switch($_POST['run']){
     break;
     case "set_inv_item":
         $_SESSION['inv_item'] = filter_var($_POST['inv_item'], FILTER_SANITIZE_STRING);
+        if(!isset($_SESSION['location_id'])) $_SESSION['location_id'] ='all';
     break;
     case "set_location_id":
         $_SESSION['location_id'] = filter_var($_POST['location_id'], FILTER_SANITIZE_STRING);
@@ -34,6 +35,16 @@ switch($_POST['run']){
     case "display-inv":
         if(isset($_SESSION['location_id'])){
             main_query($mySforceConnection, $_SESSION['location_id'], $_SESSION['inv_item']);
+        }
+    break;
+    case "display-inv":
+        if(isset($_SESSION['location_id'])){
+            main_query($mySforceConnection, $_SESSION['location_id'], $_SESSION['inv_item']);
+        }
+    break;
+    case "display-fulfillment":
+        if(isset($_SESSION['location_id'])){
+            query_fulfillment($mySforceConnection, $_SESSION['location_id']);
         }
     break;
     case "use-inv":
