@@ -11,7 +11,7 @@ $(window).on("unload", function(){
 });
 
 $(document).ready(function(){
-
+    //Acode
 
     /* get current type (for refresh and init)*/
     if($('#menuInvItem').length) get_inv_item();
