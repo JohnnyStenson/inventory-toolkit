@@ -11,7 +11,6 @@ $(window).on("unload", function(){
 });
 
 $(document).ready(function(){
-    
 
 
     /* get current type (for refresh and init)*/
