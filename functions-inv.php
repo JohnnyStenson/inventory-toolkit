@@ -169,6 +169,55 @@ function nonassigned_inv_locations($mySforceConnection, $inv_id){
 /**
  * 
  */
+function get_locations_with_inv($mySforceConnection, $inv_id, $location_id){
+    $query = "SELECT Id, TrackIT__Location__r.Name, TrackIT__Location__r.Id, TrackIT__Quantity__c
+        FROM TrackIT__Inv_Location__c 
+        WHERE TrackIT__Inventory__r.Id = '" . $inv_id . "'
+        AND isDeleted = false
+        AND TrackIT__Location__r.Id != '" . $location_id . "'
+    ";
+    $response = $mySforceConnection->query($query);
+    echo "<option value='0'>Move From:</option>";
+    foreach ($response as $record) {
+        $sObject = new SObject($record);
+        $sObject2 = new SObject($sObject->fields->TrackIT__Location__r);
+        if($sObject->fields->TrackIT__Quantity__c > 0){
+        ?>
+            <option value='{"move_loid":"<?php echo $sObject->Id; ?>","from_quant":"<?php echo $sObject->fields->TrackIT__Quantity__c; ?>"}'>
+                <?php echo $sObject2->fields->Name . "( " . $sObject->fields->TrackIT__Quantity__c . " )"; ?>
+            </option>
+        <?php 
+        }
+    }
+}
+
+
+/**
+ * 
+ */
+function move_inv($mySforceConnection, $inv_id, $loid, $quant, $move_loid, $from_quant, $curr){
+    // update from loi update to loi
+    $records_[0] = new SObject();
+	$records_[0]->Id = $move_loid;
+	$records_[0]->fields = array(
+        'TrackIT__Quantity__c' => $from_quant - $quant
+	);
+	$records[0]->type = 'TrackIT__Inv_Location__c';
+
+    $records_[1] = new SObject();
+	$records_[1]->Id = $loid;
+	$records_[1]->fields = array(
+        'TrackIT__Quantity__c' => $curr + $quant
+	);
+    $records[1]->type = 'TrackIT__Inv_Location__c';
+    
+    $response = $mySforceConnection->update($records);
+}
+
+
+/**
+ * 
+ */
 /* Query Inv by Location */
 function query_inv_by_location($mySforceConnection, $location_id){
     if($location_id == 'all'){
@@ -286,7 +335,7 @@ function display_inventory($mySforceConnection, $response, $location){
             echo "</table></div>";
 
             if('all' != $location){
-                echo "<div class='inv_use'>
+                echo "<div class='inv_use hide_drawer' data-id='" . $$sf->Id . "'>
                         <div class='used' data-id='" . $$sf->Id . "'>
                             <input type='text' class='consumeQuant' data-id='" . $$sf->Id . "' placeholder='# USED'/>
                             
@@ -303,7 +352,7 @@ function display_inventory($mySforceConnection, $response, $location){
 
             if('CREW' != $_SESSION['role']){ // BEGIN drawer
             ?>
-            <div class='openDrawerBtns' data-id='<?php echo $$sf->Id; ?>'>
+            <div class='openDrawerBtns hide_drawer' data-id='<?php echo $$sf->Id; ?>'>
                 <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</a>
                 <!-- a href='#' class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>?</!-->
             </div>
@@ -311,7 +360,7 @@ function display_inventory($mySforceConnection, $response, $location){
                 
                 <!-- BEGIN Change description -->
                 <input type='text' 
-                    class='changeDescription hide_assign2location hide_changequants' 
+                    class='changeDescription hide_assign2location hide_changequants hide_moveinv' 
                     data-id='<?php echo $$sf->Id; ?>' 
                     placeholder='Change Description'
                 />
@@ -325,10 +374,34 @@ function display_inventory($mySforceConnection, $response, $location){
                 <!-- END Change description -->
 
                 <?php
+                if('all' != $location){ // BEGIN move inventory
+                ?>
+                    <a href='#' 
+                        class='btn_moveinv blue_button hide_assign2location hide_changeDescription hide_moveinv' 
+                        data-id='<?php echo $$sf->Id; ?>' >
+                        Move Inventory Here
+                    </a>
+                    <div class='frm_moveinv' data-id='<?php echo $$sf->Id; ?>' style='display:none; border-bottom:1px solid black;'>
+                        
+                        <input type='text' 
+                            class='quant_moveinv input_text' 
+                            data-id='<?php echo $$sf->Id; ?>'
+                            data-loid='<?php echo $sObject->Id; ?>'
+                            data-curr='<?php echo $sObject->fields->TrackIT__Quantity__c; ?>'
+                            placeholder='Quantity'
+                        />
+    
+                        <select class="select_moveinv input_select" data-id="<?php echo $$sf->Id; ?>">
+                        </select>
+                    </div>
+                <?php
+                } // END move inv
+
+
                 if('all' != $location){ // BEGIN allow quant change
                 ?>
                 <a href='#' 
-                    class='btn_displaychangequants blue_button hide_changequants hide_changeDescription'
+                    class='btn_displaychangequants blue_button hide_changequants hide_changeDescription hide_moveinv'
                     data-id='<?php echo $$sf->Id; ?>' 
                     data-location='<?php echo $location; ?>'>
                     Change Quantities
@@ -364,7 +437,7 @@ function display_inventory($mySforceConnection, $response, $location){
                 ?>
                 
                 <a href='#' 
-                    class='btn_assign2newlocation blue_button hide_assign2location hide_changeDescription' 
+                    class='btn_assign2newlocation blue_button hide_assign2location hide_changeDescription hide_moveinv' 
                     data-id='<?php echo $$sf->Id; ?>' >
                     Assign to a New Location
                 </a>
@@ -394,7 +467,7 @@ function display_inventory($mySforceConnection, $response, $location){
 
 
                 <a href='#' 
-                    class='btn_movetemplocation blue_button hide_assign2location hide_changeDescription' 
+                    class='btn_movetemplocation blue_button hide_assign2location hide_changeDescription hide_moveinv' 
                     data-id='<?php echo $$sf->Id; ?>' >
                     Move to a Location Temporarily
                 </a>
@@ -414,7 +487,7 @@ function display_inventory($mySforceConnection, $response, $location){
                 }else{
                 ?>
                 <a href='#' 
-                    class='btn_unassignLocation blue_button hide_changequants hide_changeDescription' 
+                    class='btn_unassignLocation blue_button hide_changequants hide_changeDescription hide_moveinv' 
                     data-loi='<?php echo $sObject->Id; ?>' 
                     data-id="<?php echo $$sf->Id; ?>">
                     Unassign This Location
@@ -425,7 +498,7 @@ function display_inventory($mySforceConnection, $response, $location){
                 <a class='btn_OpenSFApp' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'>Open in Salesforce App</a>
 
                 <!-- BEGIN Replace Photo -->
-                <div class='hide_changequants hide_changeDescription hide_assign2location' data-id="<?php echo $$sf->Id; ?>">
+                <div class='hide_changequants hide_changeDescription hide_assign2location hide_moveinv' data-id="<?php echo $$sf->Id; ?>">
                     <form method="post" enctype="multipart/form-data" name="formUploadFile" class='frmReplacePicture ' action="upload.php">
                         
                         <label for="replPic_<?php echo $$sf->Id; ?>" class='lbl_replacePicture'>        

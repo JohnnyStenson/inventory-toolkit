@@ -93,7 +93,7 @@ $(document).ready(function(){
         e.preventDefault();
         var id = $(this).data('id');
         $('.admin_drawer[data-id="' + id + '"]').css('display', 'block');
-
+        $('.hide_drawer[data-id="' + id + '"]').css('display', 'none');
     });
 
 
@@ -122,6 +122,72 @@ $(document).ready(function(){
             success: function(response)
             {
                 alert('Changed');
+                display_records();
+            }
+        });
+    });
+
+
+    /**
+     * 
+     */
+    /* Move Inventory */
+    $('#display').delegate('.btn_moveinv', 'click', function(e) {
+        e.preventDefault();
+        var inv_id = $(this).data('id');
+
+        $('.hide_moveinv[data-id="' + inv_id + '"]').css('display', 'none');
+        $('#loading_overlay').css('display','block');
+
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'get-locations-with-inv',
+                inv_id: inv_id, 
+            },
+            success: function(response)
+            {
+                $('.select_moveinv[data-id="' + inv_id + '"]').html(response);
+                $('.frm_moveinv[data-id="' + inv_id + '"]').css('display', 'block');
+                $('#loading_overlay').css('display','none');
+            }
+        });
+
+    });
+    $('#display').delegate('.select_moveinv', 'change', function(e) {
+        var inv_id = $(this).data('id');
+        var quant = parseInt($('.restock_changequants[data-id="' + inv_id + '"]'));
+        
+        var obj = $.parseJSON($(this).find('option:selected').val());
+        var from_quant = obj.from_quant;
+        var move_loid = obj.move_loid;
+        var loid = $('.quant_moveinv[data-id="' + inv_id + '"]').data('loid');
+        var curr = $('.quant_moveinv[data-id="' + inv_id + '"]').data('curr');
+
+        if(quant = 0 || quant > from_quant){
+            alert('Quantity must be greater than 0 and less than location moving from. Refreshing. Try again.');
+            location.reload();
+            return;
+        }
+
+        $('#loading_overlay').css('display','block');
+
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'move-inv',
+                inv_id: inv_id, 
+                quant: quant,
+                move_loid: move_loid,
+                loid: loid,
+                from_quant: from_quant,
+                curr: curr
+            },
+            success: function(response)
+            {
+                alert('Moved');
                 display_records();
             }
         });

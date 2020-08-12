@@ -3,6 +3,12 @@ require 'site-auth.php';
 require_once 'functions.php';
 
 switch($_POST['run']){
+    case "move-inv":
+        move_inv($mySforceConnection, $_POST['inv_id'], $_POST['loid'], $_POST['quant'], $_POST['move_loid'], $_POST['from_quant'], $_POST['curr']);
+    break;
+    case "get-locations-with-inv":
+        get_locations_with_inv($mySforceConnection, $_POST['inv_id'], $_SESSION['location_id']);
+    break;
     case "nonassigned-inv-locations":
         nonassigned_inv_locations($mySforceConnection, $_POST['inv_id']);
     break;
