@@ -17,7 +17,9 @@
 <body>
     <!-- button onclick="topFunction()" id="btn_top" title="Go to top">Top</!-->
     <div id="loading_overlay"></div>
-    <div id="msg"></div>
+    <div id="msg"></div
+    <a name='topscroll' ></a>
+    <a href='#tooScroll' id='btn_top'>TOP</a>
     <div id='top'>
     <?php
     if(isset($_SESSION['site_auth']) && $_SESSION['site_auth']){
