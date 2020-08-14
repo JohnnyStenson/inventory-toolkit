@@ -10,6 +10,7 @@ $(window).on("unload", function(){
     });
 });
 
+
 $(document).ready(function(){
     //Acode
 
@@ -156,13 +157,20 @@ $(document).ready(function(){
     });
     $('#display').delegate('.select_moveinv', 'change', function(e) {
         var inv_id = $(this).data('id');
-        var quant = parseInt($('.restock_changequants[data-id="' + inv_id + '"]'));
+        var quant = parseInt($('.quant_moveinv[data-id="' + inv_id + '"]').val());
         
         var obj = $.parseJSON($(this).find('option:selected').val());
-        var from_quant = obj.from_quant;
+        var from_quant = parseInt(obj.from_quant);
         var move_loid = obj.move_loid;
         var loid = $('.quant_moveinv[data-id="' + inv_id + '"]').data('loid');
-        var curr = $('.quant_moveinv[data-id="' + inv_id + '"]').data('curr');
+        var curr = parseInt($('.quant_moveinv[data-id="' + inv_id + '"]').data('curr'));
+
+        /*alert('inv_id: ' + inv_id);
+        alert('quant: ' + quant);
+        alert('move_loid: ' + move_loid);
+        alert('loid: ' + loid);
+        alert('from_quant: ' + from_quant);
+        alert('curr: ' + curr);*/
 
         if(quant = 0 || quant > from_quant){
             alert('Quantity must be greater than 0 and less than location moving from. Refreshing. Try again.');
@@ -186,7 +194,7 @@ $(document).ready(function(){
             },
             success: function(response)
             {
-                alert('Moved');
+                alert('Moved' + response);
                 display_records();
             }
         });
@@ -205,10 +213,10 @@ $(document).ready(function(){
         $('#loading_overlay').css('display','block');
         var id = $(this).data('id');
         var location = $(this).data('location');
-        var quant = parseInt($('.quant_changequants[data-id="' + id + '"]').val());
-        var restock = parseInt($('.restock_changequants[data-id="' + id + '"]').val());
-        var optimal = parseInt($('.optimal_changequants[data-id="' + id + '"]').val());
-        var max_quant = parseInt($('.max_changequants[data-id="' + id + '"]').val());
+        var quant = parseFloat($('.quant_changequants[data-id="' + id + '"]').val());
+        var restock = parseFloat($('.restock_changequants[data-id="' + id + '"]').val());
+        var optimal = parseFloat($('.optimal_changequants[data-id="' + id + '"]').val());
+        var max_quant = parseFloat($('.max_changequants[data-id="' + id + '"]').val());
         
         $.ajax({
             type: "POST",
@@ -327,7 +335,7 @@ $(document).ready(function(){
      * Keep Item Location
      */
     $('#display').delegate('.btn_keepitemlocation', 'click', function(e) {
-
+        e.preventDefault();
         var id = $(this).data('id');
         $('#loading_overlay').css('display','block');
         $.ajax({

@@ -195,23 +195,36 @@ function get_locations_with_inv($mySforceConnection, $inv_id, $location_id){
 /**
  * 
  */
-function move_inv($mySforceConnection, $inv_id, $loid, $quant, $move_loid, $from_quant, $curr){
+function move_inv($mySforceConnection, $inv_id, $move_to_loid, $quant, $move_from_loid, $from_quant, $curr){
+
+    $quant = floatval($quant);
+    $from_quant = floatval($from_quant);
+    $curr = floatval($curr);
+
+    $newFromQuant = $from_quant - $quant;
+    $newToQuant = $curr + $quant;
+
     // update from loi update to loi
-    $records_[0] = new SObject();
-	$records_[0]->Id = $move_loid;
-	$records_[0]->fields = array(
-        'TrackIT__Quantity__c' => $from_quant - $quant
+    $records[0] = new SObject();
+	$records[0]->Id = $move_from_loid;
+	$records[0]->fields = array(
+        'TrackIT__Quantity__c' => $newFromQuant
 	);
 	$records[0]->type = 'TrackIT__Inv_Location__c';
 
-    $records_[1] = new SObject();
-	$records_[1]->Id = $loid;
-	$records_[1]->fields = array(
-        'TrackIT__Quantity__c' => $curr + $quant
+    /*$records[1] = new SObject();
+	$records[1]->Id = $move_to_loid;
+	$records[1]->fields = array(
+        'TrackIT__Quantity__c' => $newToQuant
 	);
-    $records[1]->type = 'TrackIT__Inv_Location__c';
+    $records[1]->type = 'TrackIT__Inv_Location__c';*/
     
     $response = $mySforceConnection->update($records);
+    print_r($response);
+    foreach ($response as $result) {
+        echo "\n" . $result->id . " updated\n";
+    }
+        
 }
 
 
@@ -335,7 +348,7 @@ function display_inventory($mySforceConnection, $response, $location){
             echo "</table></div>";
 
             if('all' != $location){
-                echo "<div class='inv_use hide_drawer' data-id='" . $$sf->Id . "'>
+                echo "<div class='inv_use hide_drawer hide_changequants' data-id='" . $$sf->Id . "'>
                         <div class='used' data-id='" . $$sf->Id . "'>
                             <input type='text' class='consumeQuant' data-id='" . $$sf->Id . "' placeholder='# USED'/>
                             
@@ -346,6 +359,9 @@ function display_inventory($mySforceConnection, $response, $location){
                         </div>
                     </div>";
             }
+
+            
+
 
             //echo "<div class='inv_barcode'><img src='".get_inventory_barcode($record['Name'])."' /></div>";
             //echo "<a class='inv_button' href='https://thundernj.lightning.force.com/lightning/r/TrackIT__Inventory__c/".$record['Id']."/view?iospref=web'>Web</a>";
@@ -372,15 +388,57 @@ function display_inventory($mySforceConnection, $response, $location){
                     Change Description
                 </a>
                 <!-- END Change description -->
-
                 <?php
+                if('all' != $location){ // BEGIN allow quant change
+                ?>
+                <a href='#' 
+                    class='btn_displaychangequants blue_button hide_changequants hide_changeDescription hide_moveinv'
+                    data-id='<?php echo $$sf->Id; ?>' 
+                    data-location='<?php echo $location; ?>'>
+                    Change Quantities
+                </a>
+                <div class='frm_changequants' style='display:none; border-bottom:1px solid black;' data-id='<?php echo $$sf->Id; ?>'>
+                    <label>Current Quantity:</label>
+                    <input type='text' 
+                        class='quant_changequants input_text' 
+                        data-id='<?php echo $$sf->Id; ?>' 
+                        value='<?php echo $sObject->fields->TrackIT__Quantity__c; ?>'
+                    />
+                    <label>Restock Point::</label>
+                    <input type='text' 
+                        class='restock_changequants input_text' 
+                        data-id='<?php echo $$sf->Id; ?>' 
+                        value='<?php echo $sObject->fields->Restock_Point__c; ?>'
+                    />
+                    <label>Optimal Quantity:</label>
+                    <input type='text' 
+                        class='optimal_changequants input_text' 
+                        data-id='<?php echo $$sf->Id; ?>' 
+                        value='<?php echo $sObject->fields->Optimal_Quantity__c; ?>'
+                    />
+                    <label>Max Quantity:</label>
+                    <input type='text' 
+                        class='max_changequants input_text' 
+                        data-id='<?php echo $$sf->Id; ?>'  
+                        value='<?php echo $sObject->fields->Max_Storage_Capacity__c; ?>'
+                    />
+                    <a href='#' 
+                    class='btn_changequants blue_button'
+                    data-id='<?php echo $$sf->Id; ?>' 
+                    data-location='<?php echo $location; ?>'>
+                    Save Quantities
+                </a>
+                </div>
+                <?php
+                } // END allow quant change
+
                 if('all' != $location){ // BEGIN move inventory
                 ?>
-                    <a href='#' 
+                    <!-- a href='#' 
                         class='btn_moveinv blue_button hide_assign2location hide_changeDescription hide_moveinv' 
-                        data-id='<?php echo $$sf->Id; ?>' >
+                        data-id='<?php //echo $$sf->Id; ?>' >
                         Move Inventory Here
-                    </a>
+                    </!-->
                     <div class='frm_moveinv' data-id='<?php echo $$sf->Id; ?>' style='display:none; border-bottom:1px solid black;'>
                         
                         <input type='text' 
@@ -398,40 +456,7 @@ function display_inventory($mySforceConnection, $response, $location){
                 } // END move inv
 
 
-                if('all' != $location){ // BEGIN allow quant change
-                ?>
-                <a href='#' 
-                    class='btn_displaychangequants blue_button hide_changequants hide_changeDescription hide_moveinv'
-                    data-id='<?php echo $$sf->Id; ?>' 
-                    data-location='<?php echo $location; ?>'>
-                    Change Quantities
-                </a>
-                <div class='frm_changequants' style='display:none; border-bottom:1px solid black;' data-id='<?php echo $$sf->Id; ?>'>
-                    <input type='text' 
-                        class='quant_changequants input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Current Quantity'
-                    />
-                    <input type='text' 
-                        class='restock_changequants input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Restock Point'
-                    />
-                    <input type='text' 
-                        class='optimal_changequants input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Optimal Quantity'
-                    />
-                    <input type='text' 
-                        class='max_changequants input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Max Quantity'
-                    />
-                    <a href='#' 
-                    class='btn_changequants blue_button'
-                    data-id='<?php echo $$sf->Id; ?>' 
-                    data-location='<?php echo $location; ?>'>
-                    Save Quantities
-                </a>
-                </div>
-                <?php
-                } // END allow quant change
+                
 
                 if('all' == $location){ // BEGIN assign to a location
                 ?>
