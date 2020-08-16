@@ -21,7 +21,7 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@3.1.1
       with:
-        ftp-server: ${{ secrets.IM_TRINC_FTP_SERVERD }}
+        ftp-server: ${{ secrets.IM_TRINC_FTP_SERVER }}
         ftp-username: ${{ secrets.IM_TRINC_FTP_USERNAME }}
         ftp-password: ${{ secrets.IM_TRINC_FTP_PASSWORD }}
         local-dir: staging.thunderroadinc.com/inventory/
