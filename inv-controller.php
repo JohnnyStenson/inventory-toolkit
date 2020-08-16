@@ -25,7 +25,7 @@ switch($_POST['run']){
         keep_item_location($mySforceConnection, $_POST['id']);
     break;
     case "keep-inv-location":
-        keep_inv_location($mySforceConnection, $_POST['loi_id'],);
+        keep_inv_location($mySforceConnection, $_POST['loi_id']);
     break;
     case "get_inv_item":
         echo isset($_SESSION['inv_item']) ? $_SESSION['inv_item'] : 0;
