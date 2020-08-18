@@ -239,7 +239,8 @@ function query_inv_by_location($mySforceConnection, $location_id){
             FROM TrackIT__Inventory__c 
             WHERE isDeleted = false";*/
 
-            $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c, TrackIT__Inventory__r.Indiv_Unit_of_Measurement_Description__c
+            $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c, TrackIT__Inventory__r.Indiv_Unit_of_Measurement_Description__c,
+            TrackIT__Location__r.Name, TrackIT__Location__r.Id
             FROM TrackIT__Inv_Location__c 
             WHERE isDeleted = false";
     }else{
@@ -278,14 +279,16 @@ function display_inventory($mySforceConnection, $response, $location){
     foreach ($response as $record) {
         $suffix = '';
         $sObject = new SObject($record);
+        /* DEPRECATED Pre change to single query Inv Locs
         if('all' !== $location){
             $sObject2 = new SObject($sObject->fields->TrackIT__Inventory__r);
             $suffix = '2';
-        }
-        $sf = 'sObject'.$suffix; // Dynamic Variable
-        print_r($sObject->Id);
+        }*/
+
+        $sf = 'sObject'; // .$suffix; // Dynamic Variable
+        print_r($sObject->Id); //a3Q1U000000i496UAA
         print_r($sObject->fields);
-        /*
+        /* DEPRECATED Pre change to single query Inv Locs
         stdClass Object ( 
             [TrackIT__Quantity__c] => 1.0 
             [Temporary_Location__c] => false
@@ -301,8 +304,29 @@ function display_inventory($mySforceConnection, $response, $location){
             ) 
         )
         */
+
+        stdClass Object ( 
+            [TrackIT__Quantity__c] => 0.0 
+            [Restock_Point__c] => 
+            [Optimal_Quantity__c] => 
+            [Max_Storage_Capacity__c] => 
+            [Temporary_Location__c] => false 
+            [TrackIT__Inventory__r] => SObject Object ( 
+                [type] => TrackIT__Inventory__c 
+                [fields] => stdClass Object ( 
+                    [Name] => Tire Repair Kit (56 pc Heavy Duty) 
+                    [Id] => a3S1U000000ifgaUAA 
+                    [Image_for_ListView__c] => https:
+                    [TrackIT__Description__c] => 
+                    [Indiv_Unit_of_Measurement_Description__c] => 
+                ) [Id] => a3S1U000000ifgaUAA 
+            ) 
+        )
+        
+
+
+        /* DEPRECATED Pre change to single query Inv Locs
         if(isset($sObject2)) print_r($sObject2->fields);
-        /*
         stdClass Object ( 
             [Name] => Jumper Cables 2 Guage 20' 
             [Id] => a3S1U000000ifX2UAI 
