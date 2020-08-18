@@ -233,21 +233,20 @@ function move_inv($mySforceConnection, $inv_id, $move_to_loid, $quant, $move_fro
  */
 /* Query Inv by Location */
 function query_inv_by_location($mySforceConnection, $location_id){
+
+    $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c, TrackIT__Inventory__r.Indiv_Unit_of_Measurement_Description__c,             TrackIT__Location__r.Name, TrackIT__Location__r.Id
+            FROM TrackIT__Inv_Location__c 
+            WHERE isDeleted = false";
+
     if($location_id == 'all'){
-        /* Query All Inventory__c */
+        /* DEPRECATED Query All Inventory__c */
         /*$query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c, Indiv_Unit_of_Measurement_Description__c
             FROM TrackIT__Inventory__c 
             WHERE isDeleted = false";*/
 
-            $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c, TrackIT__Inventory__r.Indiv_Unit_of_Measurement_Description__c,
-            TrackIT__Location__r.Name, TrackIT__Location__r.Id
-            FROM TrackIT__Inv_Location__c 
-            WHERE isDeleted = false";
+        $query .= " ORDER BY TrackIT__Inventory__r.Id";
     }else{
-        $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c, TrackIT__Inventory__r.Indiv_Unit_of_Measurement_Description__c
-            FROM TrackIT__Inv_Location__c 
-            WHERE TrackIT__Location__c = '" . $location_id . "'
-            AND isDeleted = false";
+        $query .= " AND TrackIT__Location__c = '" . $location_id . "'";
     }
     
     $response = $mySforceConnection->query($query);
@@ -276,18 +275,29 @@ function display_inventory($mySforceConnection, $response, $location){
         }
     }
 
+    $aggrInvId = '';
+    $inv_all = (object) [
+        'loi_quant_all' => 0,
+        'loi_restock_all' => 0,
+        'loi_opt_all' => 0,
+        'loi_max_all' => 0
+    ];
+
+    $array_inv_each = array();
+
     foreach ($response as $record) {
-        $suffix = '';
-        $sObject = new SObject($record);
+        
+        
         /* DEPRECATED Pre change to single query Inv Locs
+        $suffix = '';
         if('all' !== $location){
             $sObject2 = new SObject($sObject->fields->TrackIT__Inventory__r);
             $suffix = '2';
         }*/
 
         $sf = 'sObject'; // .$suffix; // Dynamic Variable
-        print_r($sObject->Id); //a3Q1U000000i496UAA
-        print_r($sObject->fields);
+        //print_r($sObject->Id); //a3Q1U000000i496UAA
+        //print_r($sObject->fields);
         /* DEPRECATED Pre change to single query Inv Locs
         stdClass Object ( 
             [TrackIT__Quantity__c] => 1.0 
@@ -305,26 +315,6 @@ function display_inventory($mySforceConnection, $response, $location){
         )
         */
 
-        stdClass Object ( 
-            [TrackIT__Quantity__c] => 0.0 
-            [Restock_Point__c] => 
-            [Optimal_Quantity__c] => 
-            [Max_Storage_Capacity__c] => 
-            [Temporary_Location__c] => false 
-            [TrackIT__Inventory__r] => SObject Object ( 
-                [type] => TrackIT__Inventory__c 
-                [fields] => stdClass Object ( 
-                    [Name] => Tire Repair Kit (56 pc Heavy Duty) 
-                    [Id] => a3S1U000000ifgaUAA 
-                    [Image_for_ListView__c] => https:
-                    [TrackIT__Description__c] => 
-                    [Indiv_Unit_of_Measurement_Description__c] => 
-                ) [Id] => a3S1U000000ifgaUAA 
-            ) 
-        )
-        
-
-
         /* DEPRECATED Pre change to single query Inv Locs
         if(isset($sObject2)) print_r($sObject2->fields);
         stdClass Object ( 
@@ -335,8 +325,96 @@ function display_inventory($mySforceConnection, $response, $location){
         )
         */
 
+        /* Current query results
+        stdClass Object ( 
+            [TrackIT__Quantity__c] => 0.0 
+            [Restock_Point__c] => 5.0 
+            [Optimal_Quantity__c] => 10.0 
+            [Max_Storage_Capacity__c] => 10.0 
+            [Temporary_Location__c] => false 
+            [TrackIT__Inventory__r] => SObject Object ( 
+                [type] => TrackIT__Inventory__c 
+                [fields] => stdClass Object ( 
+                    [Name] => 14in Cut Off Saw Blade Concrete 
+                    [Id] => a3S1U000000ifVkUAI 
+                    [Image_for_ListView__c] => https:15967603796241673962168537898168.jpg 
+                    [TrackIT__Description__c] => [Indiv_Unit_of_Measurement_Description__c] => 
+                ) [Id] => a3S1U000000ifVkUAI 
+            ) 
+            [TrackIT__Location__r] => SObject Object ( 
+                [type] => TrackIT__Location__c 
+                [fields] => stdClass Object ( 
+                    [Name] => Office 
+                    [Id] => a3W1U000000iso9UAA 
+                ) 
+                [Id] => a3W1U000000iso9UAA 
+            ) 
+        )*/
+
+        $temp_loi = new SObject($record);
+        $temp_inv_r = new SObject($loi->fields->TrackIT__Inventory__r);
+        
+        /* Combine Inv in all Locations */
+        if($aggrInvId == $inv_r->fields->Id || '' == $aggrInvId){
+            $loi = new SObject($record);
+            $inv_r = new SObject($loi->fields->TrackIT__Inventory__r);
+            $loc = new SObject($loi->fields->TrackIT__Location__r);
+            //aggregate
+            $inv_all->loi_quant_all += $loi->fields->TrackIT__Quantity__c;
+            $inv_all->loi_restock_all += $loi->fields->Restock_Point__c;
+            $inv_all->loi_opt_all += $loi->fields->Optimal_Quantity__c;
+            $inv_all->loi_max_all += $loi->fields->Max_Storage_Capacity__c;
+
+            $inv_each = (object)[
+                'quant' => $loi->fields->TrackIT__Quantity__c,
+                'restock' => $loi->fields->Restock_Point__c,
+                'opt' => $loi->fields->Optimal_Quantity__c,
+                'max' => $loi->fields->Max_Storage_Capacity__c,
+                'loc_id' => $loc->fields->Id,
+                'loc_name' => $loc->fields->Name
+            ];
+            array_push($array_inv_each, $inv_each);
+        }else{
+            //new inv record
+            $aggrInvId =$inv->inv_id
+
+            
+
+
+        }
+        $inv = (object) [
+            'loi_quant' => $loi->fields->TrackIT__Quantity__c,
+            'loi_restock' => $loi->fields->Restock_Point__c,
+            'loi_opt' => $loi->fields->Optimal_Quantity__c,
+            'loi_max' => $loi->fields->Max_Storage_Capacity__c,
+            'loi_temp' => $loi->fields->Temporary_Location__c,
+
+            'loi_quant_all' => 0,
+            'loi_restock_all' => 0,
+            'loi_opt_all' => 0,
+            'loi_max_all' => 0,
+
+            'inv_name' => $inv_r->fields->Name,
+            'inv_id' => $inv_r->fields->Id, 
+            'inv_img' => $inv_r->fields->Image_for_ListView__c,
+            'inv_descr' => $inv_r->fields->TrackIT__Description__c,
+            'inv_unit' => $inv_r->fields->Indiv_Unit_of_Measurement_Description__c,
+
+            'loc_name' => $loc->fields->Name,
+            'loc_id' => $loc->fields->Id
+        ];
+
+        
+        /* Reset after inv record displayed */
+        $inv_all = (object) [
+            'loi_quant_all' => 0,
+            'loi_restock_all' => 0,
+            'loi_opt_all' => 0,
+            'loi_max_all' => 0
+        ];
+        
         if(isset($_SESSION['fulfillment']) && $_SESSION['fulfillment']){
-            if($sObject->fields->TrackIT__Quantity__c <= $sObject->fields->Restock_Point__c){
+            if($inv->loi_quant <= $inv->loi_restock){
                 $filter_fulfillment = 1;
             }else{
                 $filter_fulfillment = 0;
@@ -347,6 +425,14 @@ function display_inventory($mySforceConnection, $response, $location){
         }
 
         if($filter_fulfillment){
+            /* Combine Inv in all Locations */
+            if($aggrInvId !== $inv->inv_id){
+
+            }else{
+
+            }
+
+
             echo "<div class='inv_record'>"; // BEGIN div.inv_record
 
             echo "<div class='inv_name'>" . $$sf->fields->Name . "</div>";
@@ -574,5 +660,6 @@ function display_inventory($mySforceConnection, $response, $location){
             } // END drawer
             echo "</div>"; // END div.inv_record
         }
+        
     }
 }
