@@ -234,11 +234,11 @@ function move_inv($mySforceConnection, $inv_id, $move_to_loid, $quant, $move_fro
 /* Query Inv by Location */
 function query_inv_by_location($mySforceConnection, $location_id){
     if($location_id == 'all'){
-        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c 
+        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c, Indiv_Unit_of_Measurement_Description__c
             FROM TrackIT__Inventory__c 
             WHERE isDeleted = false";
     }else{
-        $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c
+        $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c, TrackIT__Inventory__r.Indiv_Unit_of_Measurement_Description__c
             FROM TrackIT__Inv_Location__c 
             WHERE TrackIT__Location__c = '" . $location_id . "'
             AND isDeleted = false";
@@ -338,12 +338,14 @@ function display_inventory($mySforceConnection, $response, $location){
             // Quantities
             echo "<div class='inv_quantity'><table class='table_quants'>";
             if('all' != $location){
+                echo "<tr><td>Unit: </td><td>" . $$sf->fields->Indiv_Unit_of_Measurement_Description__c . "</td></tr>";
                 echo "<tr style='border:1px solid black;'><td>Current Quantity: </td><td>" . $sObject->fields->TrackIT__Quantity__c . "</td></tr>";
                 echo "<tr><td>Restock Point: </td><td>" . $sObject->fields->Restock_Point__c . "</td></tr>";
                 echo "<tr><td>Optimal Quantity: </td><td>" . $sObject->fields->Optimal_Quantity__c . "</td></tr>";
                 echo "<tr><td>Max Quantity: </td><td>" . $sObject->fields->Max_Storage_Capacity__c . "</td></tr>";
             }else{
-                echo "Total Quantity: " . $sObject->fields->TrackIT__Total_Quantity__c;
+                echo "<tr><td>Total Quantity:</td><td>" . $sObject->fields->TrackIT__Total_Quantity__c . "</td></tr>";
+                echo "<tr><td>Unit:</td><td>" . $sObject->fields->Indiv_Unit_of_Measurement_Description__c . "</td></tr>";
             }
             echo "</table></div>";
 

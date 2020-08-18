@@ -61,7 +61,7 @@ switch($_POST['run']){
         change_quantity_location_of_inventory($mySforceConnection, $_POST['id'], $_SESSION['location_id'], $_POST['quant'], $_POST['restock'], $_POST['optimal'], $_POST['max_quant']);
     break;
     case "changeDescription-inv":
-        change_descrption_of_inventory($mySforceConnection, $_POST['id'], $_POST['descr']);
+        change_description_of_inventory($mySforceConnection, $_POST['id'], $_POST['descr']);
     break;
     case "clear-session":
         $_SESSION['inv_item'] = 'inv';
