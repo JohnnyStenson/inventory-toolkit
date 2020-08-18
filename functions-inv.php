@@ -234,8 +234,13 @@ function move_inv($mySforceConnection, $inv_id, $move_to_loid, $quant, $move_fro
 /* Query Inv by Location */
 function query_inv_by_location($mySforceConnection, $location_id){
     if($location_id == 'all'){
-        $query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c, Indiv_Unit_of_Measurement_Description__c
+        /* Query All Inventory__c */
+        /*$query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c, Indiv_Unit_of_Measurement_Description__c
             FROM TrackIT__Inventory__c 
+            WHERE isDeleted = false";*/
+
+            $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c, TrackIT__Inventory__r.Indiv_Unit_of_Measurement_Description__c
+            FROM TrackIT__Inv_Location__c 
             WHERE isDeleted = false";
     }else{
         $query = "SELECT Id, TrackIT__Quantity__c, Restock_Point__c, Optimal_Quantity__c, Max_Storage_Capacity__c, TrackIT__Inventory__r.Name, TrackIT__Inventory__r.Id, TrackIT__Inventory__r.Image_for_ListView__c, TrackIT__Inventory__r.TrackIT__Description__c, Temporary_Location__c, TrackIT__Inventory__r.Indiv_Unit_of_Measurement_Description__c
@@ -278,8 +283,8 @@ function display_inventory($mySforceConnection, $response, $location){
             $suffix = '2';
         }
         $sf = 'sObject'.$suffix; // Dynamic Variable
-        //print_r($sObject->Id);
-        //print_r($sObject->fields);
+        print_r($sObject->Id);
+        print_r($sObject->fields);
         /*
         stdClass Object ( 
             [TrackIT__Quantity__c] => 1.0 
@@ -296,7 +301,7 @@ function display_inventory($mySforceConnection, $response, $location){
             ) 
         )
         */
-        //if(isset($sObject2)) print_r($sObject2->fields);
+        if(isset($sObject2)) print_r($sObject2->fields);
         /*
         stdClass Object ( 
             [Name] => Jumper Cables 2 Guage 20' 
