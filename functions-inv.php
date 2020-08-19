@@ -524,12 +524,12 @@ function display_inventory($mySforceConnection, $response, $location){
 
                 <!-- BEGIN Replace Photo -->
                 <div class='hide_changequants hide_changeDescription hide_assign2location hide_moveinv' data-id="<?php echo $$sf->Id; ?>">
-                    <form method="post" enctype="multipart/form-data" name="formUploadFile" class='frmReplacePicture ' action="upload.php">
+                    <form method="post" enctype="multipart/form-data" name="formUploadFile" id='frmReplacePicture_<?php echo $$sf->Id; ?>' data-id='<?php echo $$sf->Id; ?>' >
                         
                         <label for="replPic_<?php echo $$sf->Id; ?>" class='lbl_replacePicture'>        
                             <img src='uploads/rotate-camera-icon.png' style="display:block; margin:0 auto;"/> 
                             Replace Picture
-                            <input type="file" id = "replPic_<?php echo $$sf->Id; ?>" class='replacePicture' name="file" style="display:none;" data-id='<?php echo $$sf->Id; ?>' onchange="$('#loading_overlay').css('display','block'); this.form.submit();" >
+                            <input type="file" id = "replPic_<?php echo $$sf->Id; ?>" class='replacePicture' name="file" style="display:none;" data-id='<?php echo $$sf->Id; ?>' onchange="replacePicture('<?php echo $$sf->Id; ?>');" >
                         </label>
                         <input type='hidden' name='auth' value='legit' />
                         <input type='hidden' name='id' value='<?php echo $$sf->Id; ?>' />
