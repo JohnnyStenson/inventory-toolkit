@@ -58,7 +58,7 @@ require 'config.php';?>
     ?>
 
         <div id="menu">
-            <?php if($_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
+            <?php if(isset($_SESSION['site_auth']) && $_SESSION['site_auth']) show_all_locations($mySforceConnection); ?>
         </div>  
         <div id="menuHidden" style="display:none;">
             <a id='btnShowLocationButtons' href='#'>
