@@ -10,8 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" media="screen" href="style.css?v=1.0">
     <link rel="stylesheet" media="print" href="print.css?v=1.0">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
-    <script src="functions.js"></script>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/functions.js"></script>
 </head>
 
 <body>
