@@ -8,18 +8,6 @@ require_once 'functions-inv.php';
 require_once 'functions-item.php';
 
 
-function display_logon(){
-?>
-    <form method='post' action='#' style='text-align:center;' id='frmLogin'>
-        <input type='text' id='un' name='un' style='font-size:20px; padding:20px; margin:30px 0px; width:80%;' placeholder='Name/Nome'/>
-        <input type='password' id='pw' name='pw' style='font-size:20px; padding:20px; margin:30px 0px; width:80%;' placeholder='Password/Senha' />
-        
-        <a href='#' id='btnLogin'>Submit Password <br /> Enviar Senha</a>
-    </form> 
-<?php
-}
-
-
 /* Menu Buttons */
 function show_all_locations($mySforceConnection){
     echo "<a class='btnLocation' data-id='all' data-name='All Inventory' href='#'>View All</a>";
