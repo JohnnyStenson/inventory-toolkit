@@ -15,6 +15,39 @@ if(isset($_POST['pw'])){
             die();
     }
     $_SESSION['inv_item'] = 'inv';
+    rememberMe($pdo, filter_var($_POST['un'], FILTER_SANITIZE_STRING));
 }else{
     die();
+}
+
+
+function rememberMe($pdo, $user){
+    $token = bin2hex(openssl_random_pseudo_bytes(128));
+    bdump($token);
+    storeTokenForUser($pdo, $user, $token);
+    $cookie = $user . ':' . $token;
+    $mac = hash_hmac('sha256', $cookie, 'SECRET_KEY');
+    $cookie .= ':' . $mac;
+    setcookie('rememberme', $cookie);
+}
+
+
+function storeTokenForUser($pdo, $user, $token){
+    $params= [
+        "username" => $user,
+        "token" => $token
+    ];
+    $sql = "INSERT INTO 
+            rememberme 
+        SET 
+            username = :username,
+            token = :token
+        ON DUPLICATE KEY UPDATE
+            username = :username,
+            token = :token";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':username', $user, PDO::PARAM_STR);
+    $stmt->bindValue(':token', $token, PDO::PARAM_STR);
+    $stmt->execute();
+    return $pdo->lastInsertId();
 }
