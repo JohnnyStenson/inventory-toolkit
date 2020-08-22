@@ -68,7 +68,6 @@ $dsn = "mysql:host=$mysql_hostname;dbname=$mysql_database;charset=$mysql_charset
 $pdo_options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
 ];
 try {
     /** @var PDO Connect to the MySQL database using the PDO object. */
