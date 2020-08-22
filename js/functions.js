@@ -77,11 +77,13 @@ $(document).ready(function(){
         e.preventDefault();
         $('#loading_overlay').css('display','block');
         var pw = $('#pw').val();
+        var un = $('#un').val();
         $.ajax({
             type: "POST",
             url: 'login.php',
             data: {
                 pw: pw,
+                un: un
             },
             success: function(response)
             {
