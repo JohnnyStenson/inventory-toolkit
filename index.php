@@ -45,7 +45,7 @@ require 'config.php';?>
     <?php 
     }
     require 'site-auth.php'; 
-    if($_SESSION['site_auth']){
+    if(isset($_SESSION['site_auth']) && $_SESSION['site_auth']){
     ?>
         <br class='clear' />
         <div id="menuInvItem">
