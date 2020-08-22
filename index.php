@@ -1,4 +1,5 @@
-<?php if(!isset($_SESSION)) session_start(); ?>
+<?php if(!isset($_SESSION)) session_start(); 
+require 'config.php';?>
 <!DOCTYPE html>
 
 <html lang="en">
