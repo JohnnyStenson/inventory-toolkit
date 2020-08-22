@@ -33,10 +33,6 @@ function rememberMe($pdo, $user){
 
 
 function storeTokenForUser($pdo, $user, $token){
-    $params= [
-        "username" => $user,
-        "token" => $token
-    ];
     $sql = "INSERT INTO 
             rememberme 
         SET 
