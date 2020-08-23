@@ -251,17 +251,18 @@ function query_inv_by_location($mySforceConnection, $location_id){
     
     $response = $mySforceConnection->query($query);
 
-    display_inventory($mySforceConnection, $response, $location_id);
+    loop_inventory($mySforceConnection, $response, $location_id);
 }
+
 
 /**
  * 
  */
 /* Main Display Inventory */
-function display_inventory($mySforceConnection, $response, $location){
+function loop_inventory($mySforceConnection, $response, $location){
+    $ploJobs = '';
     if('all' !== $location){
         $arrayJobs = get_job_list($mySforceConnection);
-        $ploJobs = '';
         foreach($arrayJobs as $jobId => $jobName){
             $ploJobs .= "<option value='" . $jobId . "'>" . $jobName . "</option>";
         }
@@ -275,56 +276,7 @@ function display_inventory($mySforceConnection, $response, $location){
         }
     }
 
-    $aggrInvId = '';
-    $inv_all = (object) [
-        'loi_quant_all' => 0,
-        'loi_restock_all' => 0,
-        'loi_opt_all' => 0,
-        'loi_max_all' => 0
-    ];
-
-    $array_inv_each = array();
-
     foreach ($response as $record) {
-        
-        
-        /* DEPRECATED Pre change to single query Inv Locs
-        $suffix = '';
-        if('all' !== $location){
-            $sObject2 = new SObject($sObject->fields->TrackIT__Inventory__r);
-            $suffix = '2';
-        }*/
-
-        $sf = 'sObject'; // .$suffix; // Dynamic Variable
-        //print_r($sObject->Id); //a3Q1U000000i496UAA
-        //print_r($sObject->fields);
-        /* DEPRECATED Pre change to single query Inv Locs
-        stdClass Object ( 
-            [TrackIT__Quantity__c] => 1.0 
-            [Temporary_Location__c] => false
-            [TrackIT__Inventory__r] => SObject Object ( 
-                [type] => TrackIT__Inventory__c 
-                [fields] => stdClass Object ( 
-                    [Name] => Jumper Cables 2 Guage 20' 
-                    [Id] => a3S1U000000ifX2UAI 
-                    [Image_for_ListView__c] => https://lightning.thunderroadinc.com/inventory/uploads/15967416702656281675244399269955.jpg 
-                        [TrackIT__Description__c] => 
-                ) 
-                [Id] => a3S1U000000ifX2UAI 
-            ) 
-        )
-        */
-
-        /* DEPRECATED Pre change to single query Inv Locs
-        if(isset($sObject2)) print_r($sObject2->fields);
-        stdClass Object ( 
-            [Name] => Jumper Cables 2 Guage 20' 
-            [Id] => a3S1U000000ifX2UAI 
-            [Image_for_ListView__c] => https://lightning.thunderroadinc.com/inventory/uploads/15967416702656281675244399269955.jpg 
-            [TrackIT__Description__c] => 
-        )
-        */
-
         /* Current query results
         stdClass Object ( 
             [TrackIT__Quantity__c] => 0.0 
@@ -351,315 +303,316 @@ function display_inventory($mySforceConnection, $response, $location){
             ) 
         )*/
 
-        $temp_loi = new SObject($record);
-        $temp_inv_r = new SObject($loi->fields->TrackIT__Inventory__r);
-        
-        /* Combine Inv in all Locations */
-        if($aggrInvId == $inv_r->fields->Id || '' == $aggrInvId){
-            $loi = new SObject($record);
-            $inv_r = new SObject($loi->fields->TrackIT__Inventory__r);
-            $loc = new SObject($loi->fields->TrackIT__Location__r);
-            //aggregate
-            $inv_all->loi_quant_all += $loi->fields->TrackIT__Quantity__c;
-            $inv_all->loi_restock_all += $loi->fields->Restock_Point__c;
-            $inv_all->loi_opt_all += $loi->fields->Optimal_Quantity__c;
-            $inv_all->loi_max_all += $loi->fields->Max_Storage_Capacity__c;
+        $loi = new SObject($record);
+        $inv_r = new SObject($loi->fields->TrackIT__Inventory__r);
+        $loc = new SObject($loi->fields->TrackIT__Location__r);
 
+        //echo $inv_r->fields->Name . ' : ' . $loi->fields->TrackIT__Quantity__c . '<br />';
+
+        /* Combine Inv in all Locations */
+        if(!isset($inv) || $inv->inv_id != $inv_r->fields->Id){ // initiate new inv
+            if(isset($inv)){
+                display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs);
+                bdump($inv);
+            }
+
+            $inv = (object) [
+                'loi_id'            => $loi->Id,
+                'loi_quant'         => floatval($loi->fields->TrackIT__Quantity__c),
+                'loi_restock'       => floatval($loi->fields->Restock_Point__c),
+                'loi_opt'           => floatval($loi->fields->Optimal_Quantity__c),
+                'loi_max'           => floatval($loi->fields->Max_Storage_Capacity__c),
+                'loi_temp'          => $loi->fields->Temporary_Location__c,
+    
+                'loi_quant_all'     => floatval($loi->fields->TrackIT__Quantity__c),
+                'loi_restock_all'   => floatval($loi->fields->Restock_Point__c),
+                'loi_opt_all'       => floatval($loi->fields->Optimal_Quantity__c),
+                'loi_max_all'       => floatval($loi->fields->Max_Storage_Capacity__c),
+    
+                'inv_name'          => $inv_r->fields->Name,
+                'inv_id'            => $inv_r->fields->Id, 
+                'inv_img'           => $inv_r->fields->Image_for_ListView__c,
+                'inv_descr'         => $inv_r->fields->TrackIT__Description__c,
+                'inv_unit'          => $inv_r->fields->Indiv_Unit_of_Measurement_Description__c,
+    
+                'loc_name'          => $loc->fields->Name,
+                'loc_id'            => $loc->fields->Id
+            ];
+
+            $array_inv_each = array();
             $inv_each = (object)[
-                'quant' => $loi->fields->TrackIT__Quantity__c,
-                'restock' => $loi->fields->Restock_Point__c,
-                'opt' => $loi->fields->Optimal_Quantity__c,
-                'max' => $loi->fields->Max_Storage_Capacity__c,
-                'loc_id' => $loc->fields->Id,
-                'loc_name' => $loc->fields->Name
+                'quant'     => floatval($loi->fields->TrackIT__Quantity__c),
+                'restock'   => floatval($loi->fields->Restock_Point__c),
+                'opt'       => floatval($loi->fields->Optimal_Quantity__c),
+                'max'       => floatval($loi->fields->Max_Storage_Capacity__c),
+                'loc_id'    => $loc->fields->Id,
+                'loc_name'  => $loc->fields->Name
             ];
             array_push($array_inv_each, $inv_each);
+
         }else{
-            //new inv record
-            $aggrInvId =$inv->inv_id
+            //new record same inv
+            //aggregate
+            $inv->loi_quant_all     += floatval($loi->fields->TrackIT__Quantity__c);
+            $inv->loi_restock_all   += floatval($loi->fields->Restock_Point__c);
+            $inv->loi_opt_all       += floatval($loi->fields->Optimal_Quantity__c);
+            $inv->loi_max_all       += floatval($loi->fields->Max_Storage_Capacity__c);
 
-            
-
-
+            // add loi
+            $inv_each = (object)[
+                'quant'     => floatval($loi->fields->TrackIT__Quantity__c),
+                'restock'   => floatval($loi->fields->Restock_Point__c),
+                'opt'       => floatval($loi->fields->Optimal_Quantity__c),
+                'max'       => floatval($loi->fields->Max_Storage_Capacity__c),
+                'loc_id'    => $loc->fields->Id,
+                'loc_name'  => $loc->fields->Name
+            ];
+            array_push($array_inv_each, $inv_each);
         }
-        $inv = (object) [
-            'loi_quant' => $loi->fields->TrackIT__Quantity__c,
-            'loi_restock' => $loi->fields->Restock_Point__c,
-            'loi_opt' => $loi->fields->Optimal_Quantity__c,
-            'loi_max' => $loi->fields->Max_Storage_Capacity__c,
-            'loi_temp' => $loi->fields->Temporary_Location__c,
+    }
+}
 
-            'loi_quant_all' => 0,
-            'loi_restock_all' => 0,
-            'loi_opt_all' => 0,
-            'loi_max_all' => 0,
 
-            'inv_name' => $inv_r->fields->Name,
-            'inv_id' => $inv_r->fields->Id, 
-            'inv_img' => $inv_r->fields->Image_for_ListView__c,
-            'inv_descr' => $inv_r->fields->TrackIT__Description__c,
-            'inv_unit' => $inv_r->fields->Indiv_Unit_of_Measurement_Description__c,
 
-            'loc_name' => $loc->fields->Name,
-            'loc_id' => $loc->fields->Id
-        ];
-
-        
-        /* Reset after inv record displayed */
-        $inv_all = (object) [
-            'loi_quant_all' => 0,
-            'loi_restock_all' => 0,
-            'loi_opt_all' => 0,
-            'loi_max_all' => 0
-        ];
-        
-        if(isset($_SESSION['fulfillment']) && $_SESSION['fulfillment']){
-            if($inv->loi_quant <= $inv->loi_restock){
+function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs){
+    if(isset($_SESSION['fulfillment']) && $_SESSION['fulfillment']){
+        $filter_fulfillment = 0;
+        foreach($array_inv_each as $loinv){
+            if($loinv->quant <= $loinv->restock){
                 $filter_fulfillment = 1;
-            }else{
-                $filter_fulfillment = 0;
             }
-            
-        }else{
-            $filter_fulfillment = 1;
+        }        
+    }else{
+        $filter_fulfillment = 1;
+    }
+
+    if($filter_fulfillment){
+        echo "<div class='inv_record'>"; // BEGIN div.inv_record
+
+        echo "<div class='inv_name'>" . $inv->inv_name . "</div>";
+
+        if(!empty($inv->inv_descr)){
+            echo "<div class='inv_name'>" . $inv->inv_descr . "</div>";
         }
 
-        if($filter_fulfillment){
-            /* Combine Inv in all Locations */
-            if($aggrInvId !== $inv->inv_id){
+        echo "<div class='inv_image_container'><img class='inv_image' src='" . $inv->inv_img . "' /></div>";
 
-            }else{
+        // Temporary Location
+        if('all' != $location && 'true' == $inv->loi_temp){
+        ?>
+            <a class='btn_red_outline<?php echo ('MNGR' == $_SESSION['role']) ? " btn_keepinvlocation' href='#'"  : "'";  ?> data-id='<?php echo $inv->inv_id; ?>' data-loi='<?php echo $inv->loi_id; ?>'>Temporary <?php echo ('MNGR' == $_SESSION['role']) ? ' <br />(Click to Keep or<br /> Unassign Below)' : '';  ?></a>
+        <?php 
+        }
 
+        // Quantities
+        echo "<div class='inv_quantity'><table class='table_quants'>";
+        if('all' != $location){
+            echo "<tr><td>Unit: </td><td>" . $inv->inv_unit . "</td></tr>";
+            echo "<tr style='border:1px solid black;'><td>Current Quantity: </td><td>" . $inv->loi_quant . "</td></tr>";
+            echo "<tr><td>Restock Point: </td><td>" . $inv->loi_restock . "</td></tr>";
+            echo "<tr><td>Optimal Quantity: </td><td>" . $inv->loi_opt . "</td></tr>";
+            echo "<tr><td>Max Quantity: </td><td>" . $inv->loi_max . "</td></tr>";
+            if($inv->loi_quant <= $inv->loi_restock){
+                echo "<tr style='border:1px solid red;'><td>NEEDS: </td><td>" . floatval($inv->loi_opt) - floatval($inv->loi_quant) . "</td></tr>";
             }
-
-
-            echo "<div class='inv_record'>"; // BEGIN div.inv_record
-
-            echo "<div class='inv_name'>" . $$sf->fields->Name . "</div>";
-            if(!empty($$sf->fields->TrackIT__Description__c)){
-                echo "<div class='inv_name'>" . $$sf->fields->TrackIT__Description__c . "</div>";
+        }else{
+            echo "<tr><td>Unit: </td><td>" . $inv->inv_unit . "</td></tr>";
+            foreach($array_inv_each as $each_loi){
+                echo "<tr style='border:1px solid black;'><td>" . $each_loi->loc_name . ":</td><td>" . $each_loi->quant . "</td></tr>";
+                if($each_loi->quant <= $each_loi->restock){
+                    echo "<tr style='border:1px solid red;'><td>" . $each_loi->loc_name . " NEEDS:</td><td>" . floatval($each_loi->opt) - floatval($each_loi->quant) . "</td></tr>";
+                }
+                
             }
+        }
+        echo "</table></div>";
 
-            echo "<div class='inv_image_container'><img class='inv_image' src='" . $$sf->fields->Image_for_ListView__c . "' /></div>";
+        if('all' != $location){
+            echo "<div class='inv_use hide_drawer hide_changequants' data-id='" . $inv->inv_id . "'>
+                <div class='used' data-id='" . $inv->inv_id . "'>
+                    <input type='text' class='consumeQuant' data-id='" . $inv->inv_id . "' placeholder='# USED'/>
+                    
+                    <label class='lbl_consumeJob' style='display:none;' data-id='" . $inv->inv_id . "' >Select Job Used on to <br />Deduct from Inventory:</label>
+                    <select class='consumeJob' data-id='" . $inv->inv_id . "' data-location='" . $location . "' data-current='" . $inv->loi_quant . "'  ><option value='0'>Choose:</option>" .
+                    $ploJobs .
+                    "</select>
+                </div>
+            </div>";
+        }
 
-            // Temporary Location
-            if('all' != $location && 'true' == $sObject->fields->Temporary_Location__c
-            ){
-            ?>
-                <a class='btn_red_outline<?php echo ('MNGR' == $_SESSION['role']) ? " btn_keepinvlocation' href='#'"  : "'";  ?> data-id='<?php echo $$sf->Id; ?>' data-loi='<?php echo $sObject->Id; ?>'>Temporary <?php echo ('MNGR' == $_SESSION['role']) ? ' <br />(Click to Keep or<br /> Unassign Below)' : '';  ?></a>
-            <?php 
-            }
-
-            // Quantities
-            echo "<div class='inv_quantity'><table class='table_quants'>";
-            if('all' != $location){
-                echo "<tr><td>Unit: </td><td>" . $$sf->fields->Indiv_Unit_of_Measurement_Description__c . "</td></tr>";
-                echo "<tr style='border:1px solid black;'><td>Current Quantity: </td><td>" . $sObject->fields->TrackIT__Quantity__c . "</td></tr>";
-                echo "<tr><td>Restock Point: </td><td>" . $sObject->fields->Restock_Point__c . "</td></tr>";
-                echo "<tr><td>Optimal Quantity: </td><td>" . $sObject->fields->Optimal_Quantity__c . "</td></tr>";
-                echo "<tr><td>Max Quantity: </td><td>" . $sObject->fields->Max_Storage_Capacity__c . "</td></tr>";
-            }else{
-                echo "<tr><td>Total Quantity:</td><td>" . $sObject->fields->TrackIT__Total_Quantity__c . "</td></tr>";
-                echo "<tr><td>Unit:</td><td>" . $sObject->fields->Indiv_Unit_of_Measurement_Description__c . "</td></tr>";
-            }
-            echo "</table></div>";
-
-            if('all' != $location){
-                echo "<div class='inv_use hide_drawer hide_changequants' data-id='" . $$sf->Id . "'>
-                        <div class='used' data-id='" . $$sf->Id . "'>
-                            <input type='text' class='consumeQuant' data-id='" . $$sf->Id . "' placeholder='# USED'/>
-                            
-                            <label class='lbl_consumeJob' style='display:none;' data-id='" . $$sf->Id . "' >Select Job Used on to <br />Deduct from Inventory:</label>
-                            <select class='consumeJob' data-id='" . $$sf->Id . "' data-location='" . $location . "' data-current='" . $sObject->fields->TrackIT__Quantity__c . "'  ><option value='0'>Choose:</option>" .
-                            $ploJobs .
-                            "</select>
-                        </div>
-                    </div>";
-            }
-
-            
-
-
-            //echo "<div class='inv_barcode'><img src='".get_inventory_barcode($record['Name'])."' /></div>";
+        //echo "<div class='inv_barcode'><img src='".get_inventory_barcode($record['Name'])."' /></div>";
             //echo "<a class='inv_button' href='https://thundernj.lightning.force.com/lightning/r/TrackIT__Inventory__c/".$record['Id']."/view?iospref=web'>Web</a>";
-
-            if('CREW' != $_SESSION['role']){ // BEGIN drawer
-            ?>
-            <div class='openDrawerBtns hide_drawer' data-id='<?php echo $$sf->Id; ?>'>
-                <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>&vellip;</a>
-                <!-- a href='#' class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $$sf->Id; ?>'>?</!-->
+        if('CREW' != $_SESSION['role']){ // BEGIN drawer
+        ?>
+            <div class='openDrawerBtns hide_drawer' data-id='<?php echo $inv->inv_id; ?>'>
+                <a href='#' class='openAdminDrawer btnOpenDrawer' data-id='<?php echo $inv->inv_id; ?>'>&vellip;</a>
+                <!-- a href='#' class='openMoreDrawer btnOpenDrawer' data-id='<?php echo $inv->inv_id; ?>'>?</!-->
             </div>
-            <div class='admin_drawer' data-id='<?php echo $$sf->Id; ?>'>
+            <div class='admin_drawer' data-id='<?php echo $inv->inv_id; ?>'>
                 
                 <!-- BEGIN Change description -->
                 <input type='text' 
                     class='changeDescription hide_assign2location hide_changequants hide_moveinv' 
-                    data-id='<?php echo $$sf->Id; ?>' 
+                    data-id='<?php echo $inv->inv_id; ?>' 
                     placeholder='Change Description'
                 />
                 <a href='#' 
                     class='btn_changeDescription'
                     style='display:none;' 
-                    data-id='<?php echo $$sf->Id; ?>'
+                    data-id='<?php echo $inv->inv_id; ?>'
                     data-location='<?php echo $location; ?>' >
                     Change Description
                 </a>
                 <!-- END Change description -->
-                <?php
-                if('all' != $location){ // BEGIN allow quant change
-                ?>
+
+            <?php
+            if('all' != $location){ // BEGIN allow quant change
+            ?>
                 <a href='#' 
                     class='btn_displaychangequants blue_button hide_changequants hide_changeDescription hide_moveinv'
-                    data-id='<?php echo $$sf->Id; ?>' 
+                    data-id='<?php echo $inv->inv_id; ?>' 
                     data-location='<?php echo $location; ?>'>
                     Change Quantities
                 </a>
-                <div class='frm_changequants' style='display:none; border-bottom:1px solid black;' data-id='<?php echo $$sf->Id; ?>'>
+                <div class='frm_changequants' style='display:none; border-bottom:1px solid black;' data-id='<?php echo $inv->inv_id; ?>'>
                     <label>Current Quantity:</label>
                     <input type='text' 
                         class='quant_changequants input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' 
-                        value='<?php echo $sObject->fields->TrackIT__Quantity__c; ?>'
+                        data-id='<?php echo $inv->inv_id; ?>' 
+                        value='<?php echo $inv->loi_quant; ?>'
                     />
                     <label>Restock Point::</label>
                     <input type='text' 
                         class='restock_changequants input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' 
-                        value='<?php echo $sObject->fields->Restock_Point__c; ?>'
+                        data-id='<?php echo $inv->inv_id; ?>' 
+                        value='<?php echo $inv->loi_restock; ?>'
                     />
                     <label>Optimal Quantity:</label>
                     <input type='text' 
                         class='optimal_changequants input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' 
-                        value='<?php echo $sObject->fields->Optimal_Quantity__c; ?>'
+                        data-id='<?php echo $inv->inv_id; ?>' 
+                        value='<?php echo $inv->loi_opt; ?>'
                     />
                     <label>Max Quantity:</label>
                     <input type='text' 
                         class='max_changequants input_text' 
-                        data-id='<?php echo $$sf->Id; ?>'  
-                        value='<?php echo $sObject->fields->Max_Storage_Capacity__c; ?>'
+                        data-id='<?php echo $inv->inv_id; ?>'  
+                        value='<?php echo $inv->loi_max; ?>'
                     />
                     <a href='#' 
                     class='btn_changequants blue_button'
-                    data-id='<?php echo $$sf->Id; ?>' 
+                    data-id='<?php echo $inv->inv_id; ?>' 
                     data-location='<?php echo $location; ?>'>
                     Save Quantities
-                </a>
+                    </a>
                 </div>
-                <?php
-                } // END allow quant change
+            <?php
+            } // END allow quant change
 
-                if('all' != $location){ // BEGIN move inventory
-                ?>
-                    <!-- a href='#' 
-                        class='btn_moveinv blue_button hide_assign2location hide_changeDescription hide_moveinv' 
-                        data-id='<?php //echo $$sf->Id; ?>' >
-                        Move Inventory Here
-                    </!-->
-                    <div class='frm_moveinv' data-id='<?php echo $$sf->Id; ?>' style='display:none; border-bottom:1px solid black;'>
+            if('all' != $location){ // BEGIN move inventory
+            ?>
+                <!-- a href='#' 
+                    class='btn_moveinv blue_button hide_assign2location hide_changeDescription hide_moveinv' 
+                    data-id='<?php //echo $inv->inv_id; ?>' >
+                    Move Inventory Here
+                </!-->
+                <div class='frm_moveinv' data-id='<?php echo $inv->inv_id; ?>' style='display:none; border-bottom:1px solid black;'>
                         
-                        <input type='text' 
-                            class='quant_moveinv input_text' 
-                            data-id='<?php echo $$sf->Id; ?>'
-                            data-loid='<?php echo $sObject->Id; ?>'
-                            data-curr='<?php echo $sObject->fields->TrackIT__Quantity__c; ?>'
-                            placeholder='Quantity'
-                        />
+                    <input type='text' 
+                        class='quant_moveinv input_text' 
+                        data-id='<?php echo $inv->inv_id; ?>'
+                        data-loid='<?php echo $inv->loi_id; ?>'
+                        data-curr='<?php echo $inv->loi_quant; ?>'
+                        placeholder='Quantity'
+                    />
     
-                        <select class="select_moveinv input_select" data-id="<?php echo $$sf->Id; ?>">
-                        </select>
-                    </div>
-                <?php
-                } // END move inv
+                    <select class="select_moveinv input_select" data-id="<?php echo $inv->inv_id; ?>">
+                    </select>
+                </div>              
+            <?php
+            } // END move inv
 
-
-                
-
-                if('all' == $location){ // BEGIN assign to a location
-                ?>
-                
+            if('all' == $location){ // BEGIN assign to a location
+            ?>
+                    
                 <a href='#' 
                     class='btn_assign2newlocation blue_button hide_assign2location hide_changeDescription hide_moveinv' 
-                    data-id='<?php echo $$sf->Id; ?>' >
+                    data-id='<?php echo $inv->inv_id; ?>' >
                     Assign to a New Location
                 </a>
-                <div class='frm_assign2location' data-id='<?php echo $$sf->Id; ?>' style='display:none; border-bottom:1px solid black;'>
-                    
+                <div class='frm_assign2location' data-id='<?php echo $inv->inv_id; ?>' style='display:none; border-bottom:1px solid black;'>
+                        
                     <input type='text' 
                         class='assign_quant input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Quantity'
+                        data-id='<?php echo $inv->inv_id; ?>' placeholder='Quantity'
                     />
                     <input type='text' 
                         class='assign_restock input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Restock Point'
+                        data-id='<?php echo $inv->inv_id; ?>' placeholder='Restock Point'
                     />
                     <input type='text' 
                         class='assign_optimal input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Optimal Quantity'
+                        data-id='<?php echo $inv->inv_id; ?>' placeholder='Optimal Quantity'
                     />
                     <input type='text' 
                         class='assign_max input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Max Capacity'
+                        data-id='<?php echo $inv->inv_id; ?>' placeholder='Max Capacity'
                     />
 
-                    <select class="select_assign2location input_select" data-id="<?php echo $$sf->Id; ?>">
+                    <select class="select_assign2location input_select" data-id="<?php echo $inv->inv_id; ?>">
                     </select>
                 </div>
-
-
-
+    
                 <a href='#' 
                     class='btn_movetemplocation blue_button hide_assign2location hide_changeDescription hide_moveinv' 
-                    data-id='<?php echo $$sf->Id; ?>' >
+                    data-id='<?php echo $inv->inv_id; ?>' >
                     Move to a Location Temporarily
                 </a>
-                <div class='frm_movetemplocation' data-id='<?php echo $$sf->Id; ?>' style='display:none; border-bottom:1px solid black;'>
+                <div class='frm_movetemplocation' data-id='<?php echo $inv->inv_id; ?>' style='display:none; border-bottom:1px solid black;'>
                     
                     <input type='text' 
                         class='assign_movetemplocation input_text' 
-                        data-id='<?php echo $$sf->Id; ?>' placeholder='Quantity'
+                        data-id='<?php echo $inv->inv_id; ?>' placeholder='Quantity'
                     />
 
-                    <select class="select_movetemplocation input_select" data-id="<?php echo $$sf->Id; ?>">
+                    <select class="select_movetemplocation input_select" data-id="<?php echo $inv->inv_id; ?>">
                     </select>
                 </div>
-                
-
-                <?php
-                }else{
-                ?>
+            <?php
+            }else{
+            ?>
                 <a href='#' 
                     class='btn_unassignLocation blue_button hide_changequants hide_changeDescription hide_moveinv' 
-                    data-loi='<?php echo $sObject->Id; ?>' 
-                    data-id="<?php echo $$sf->Id; ?>">
+                    data-loi='<?php echo $inv->loi_id; ?>' 
+                    data-id="<?php echo $inv->inv_id; ?>">
                     Unassign This Location
                 </a>
-                <?php 
-                } // END assign to a location
-                ?>
-                <a class='btn_OpenSFApp' href='salesforce1://sObject/<?php echo $$sf->Id; ?>/view'>Open in Salesforce App</a>
+            <?php 
+            } // END assign to a location
+            ?>
+                <a class='btn_OpenSFApp' href='salesforce1://sObject/<?php echo $inv->inv_id; ?>/view'>Open in Salesforce App</a>
 
                 <!-- BEGIN Replace Photo -->
-                <div class='hide_changequants hide_changeDescription hide_assign2location hide_moveinv' data-id="<?php echo $$sf->Id; ?>">
-                    <form method="post" enctype="multipart/form-data" name="formUploadFile" id='frmReplacePicture_<?php echo $$sf->Id; ?>' data-id='<?php echo $$sf->Id; ?>' >
+                <div class='hide_changequants hide_changeDescription hide_assign2location hide_moveinv' data-id="<?php echo $inv->inv_id; ?>">
+                    <form method="post" enctype="multipart/form-data" name="formUploadFile" id='frmReplacePicture_<?php echo $inv->inv_id; ?>' data-id='<?php echo $inv->inv_id; ?>' >
                         
-                        <label for="replPic_<?php echo $$sf->Id; ?>" class='lbl_replacePicture'>        
+                        <label for="replPic_<?php echo $inv->inv_id; ?>" class='lbl_replacePicture'>        
                             <img src='uploads/rotate-camera-icon.png' style="display:block; margin:0 auto;"/> 
                             Replace Picture
-                            <input type="file" id = "replPic_<?php echo $$sf->Id; ?>" class='replacePicture' name="file" style="display:none;" data-id='<?php echo $$sf->Id; ?>' onchange="replacePicture('<?php echo $$sf->Id; ?>');" >
+                            <input type="file" id = "replPic_<?php echo $inv->inv_id; ?>" class='replacePicture' name="file" style="display:none;" data-id='<?php echo $inv->inv_id; ?>' onchange="replacePicture('<?php echo $inv->inv_id; ?>');" >
                         </label>
                         <input type='hidden' name='auth' value='legit' />
-                        <input type='hidden' name='id' value='<?php echo $$sf->Id; ?>' />
+                        <input type='hidden' name='id' value='<?php echo $inv->inv_id; ?>' />
                     </form>
                 </div>
                 <!-- END Replace Photo -->
 
             </div> <!-- END .admin_drawer -->
-            
-            <?php
-            } // END drawer
-            echo "</div>"; // END div.inv_record
-        }
         
+        <?php
+        } // END drawer
+
+
+        echo "</div>"; // END div.inv_record
     }
 }
