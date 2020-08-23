@@ -33,7 +33,7 @@ function rememberMeCookie($pdo){
             $_SESSION['user'] = $user;
             $_SESSION['site_auth'] = TRUE;
             $_SESSION['role'] = $row['session_role'];
-            $_SESSION['inv_item'] = 'inv';
+            $_SESSION['inv_item'] = isset($_SESSION['inv_item']) ? $_SESSION['inv_item'] : 'inv';
             return true;
         }else{
             return false;
