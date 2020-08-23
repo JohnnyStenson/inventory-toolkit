@@ -36,6 +36,9 @@ $(document).ready(function(){
     }
 
 
+        
+
+
     /* Change  Type */
     $('body').delegate('.btn_menuInvItem', 'click', function(e) {
         e.preventDefault();
@@ -74,11 +77,13 @@ $(document).ready(function(){
         e.preventDefault();
         $('#loading_overlay').css('display','block');
         var pw = $('#pw').val();
+        var un = $('#un').val();
         $.ajax({
             type: "POST",
             url: 'login.php',
             data: {
                 pw: pw,
+                un: un
             },
             success: function(response)
             {
@@ -126,6 +131,9 @@ $(document).ready(function(){
             }
         });
     });
+
+
+    
 
 
     /**
@@ -549,6 +557,34 @@ $(document).ready(function(){
 
 
 });
+
+
+/**
+ * Ajax Upload Picture 
+ */
+/* Replace Picture */
+function replacePicture(inv_id) {
+
+    $('#loading_overlay').css('display','block');
+
+    var form_data = new FormData(document.getElementById('frmReplacePicture_' + inv_id));
+    jQuery.each($('.replacePicture[data-id="' + inv_id + '"]')[0].files, function(i, file) {
+        form_data.append(i, file);
+    });
+
+    $.ajax({
+        type: "POST",
+        cache:false,
+        processData: false,
+        contentType: false,
+        data: form_data,
+        url: 'upload.php',
+        success: function(response)
+        {
+            display_records();
+        }
+    });
+};
 
 
 /**

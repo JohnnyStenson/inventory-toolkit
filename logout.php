@@ -2,5 +2,7 @@
 session_start();
 session_unset();
 session_destroy();
-header('Location: https://lightning.thunderroadinc.com/inventory/');
+setcookie("rememberme", time() - 3600);
+$sSubDomain = str_replace('.thunderroadinc.com','',$_SERVER['HTTP_HOST']);
+header('Location: https://' . $sSubDomain . '.thunderroadinc.com/inventory/');
 exit;
