@@ -276,6 +276,42 @@ function loop_inventory($mySforceConnection, $response, $location){
         }
     }
 
+    /* initiate inv object */
+    $inv = (object) [
+        'loi_id'            => '',
+        'loi_quant'         => 0.0,
+        'loi_restock'       => 0.0,
+        'loi_opt'           => 0.0,
+        'loi_max'           => 0.0,
+        'loi_temp'          => false,
+
+        'loi_quant_all'     => 0.0,
+        'loi_restock_all'   => 0.0,
+        'loi_opt_all'       => 0.0,
+        'loi_max_all'       => 0.0,
+
+        'inv_name'          => '',
+        'inv_id'            => '', 
+        'inv_img'           => '',
+        'inv_descr'         => '',
+        'inv_unit'          => '',
+
+        'loc_name'          => '',
+        'loc_id'            => ''
+    ];
+    $inv_each = (object)[
+        'quant'     => 0.0,
+        'restock'   => 0.0,
+        'opt'       => 0.0,
+        'max'       => 0.0,
+        'loc_id'    => '',
+        'loc_name'  => ''
+    ];
+
+    $array_inv_each = array();
+
+    $flag_skip_first = true;
+
     foreach ($response as $record) {
         /* Current query results
         stdClass Object ( 
@@ -307,68 +343,58 @@ function loop_inventory($mySforceConnection, $response, $location){
         $inv_r = new SObject($loi->fields->TrackIT__Inventory__r);
         $loc = new SObject($loi->fields->TrackIT__Location__r);
 
-        //echo $inv_r->fields->Name . ' : ' . $loi->fields->TrackIT__Quantity__c . '<br />';
-
         /* Combine Inv in all Locations */
         if(!isset($inv) || $inv->inv_id != $inv_r->fields->Id){ // initiate new inv
-            if(isset($inv)){
+            if(!$flag_skip_first){
                 display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs);
-                bdump($inv);
             }
 
-            $inv = (object) [
-                'loi_id'            => $loi->Id,
-                'loi_quant'         => floatval($loi->fields->TrackIT__Quantity__c),
-                'loi_restock'       => floatval($loi->fields->Restock_Point__c),
-                'loi_opt'           => floatval($loi->fields->Optimal_Quantity__c),
-                'loi_max'           => floatval($loi->fields->Max_Storage_Capacity__c),
-                'loi_temp'          => $loi->fields->Temporary_Location__c,
-    
-                'loi_quant_all'     => floatval($loi->fields->TrackIT__Quantity__c),
-                'loi_restock_all'   => floatval($loi->fields->Restock_Point__c),
-                'loi_opt_all'       => floatval($loi->fields->Optimal_Quantity__c),
-                'loi_max_all'       => floatval($loi->fields->Max_Storage_Capacity__c),
-    
-                'inv_name'          => $inv_r->fields->Name,
-                'inv_id'            => $inv_r->fields->Id, 
-                'inv_img'           => $inv_r->fields->Image_for_ListView__c,
-                'inv_descr'         => $inv_r->fields->TrackIT__Description__c,
-                'inv_unit'          => $inv_r->fields->Indiv_Unit_of_Measurement_Description__c,
-    
-                'loc_name'          => $loc->fields->Name,
-                'loc_id'            => $loc->fields->Id
-            ];
+
+            $inv->loi_id             = $loi->Id;
+            $inv->loi_quant          = $loi->fields->TrackIT__Quantity__c;
+            $inv->loi_restock        = $loi->fields->Restock_Point__c;
+            $inv->loi_opt            = $loi->fields->Optimal_Quantity__c;
+            $inv->loi_max            = $loi->fields->Max_Storage_Capacity__c;
+            $inv->loi_temp           = $loi->fields->Temporary_Location__c;
+            $inv->loi_quant_all      = $loi->fields->TrackIT__Quantity__c;
+            $inv->loi_restock_all    = $loi->fields->Restock_Point__c;
+            $inv->loi_opt_all        = $loi->fields->Optimal_Quantity__c;
+            $inv->loi_max_all        = $loi->fields->Max_Storage_Capacity__c;
+            $inv->inv_name           = $inv_r->fields->Name;
+            $inv->inv_id             = $inv_r->fields->Id;
+            $inv->inv_img            = $inv_r->fields->Image_for_ListView__c;
+            $inv->inv_descr          = $inv_r->fields->TrackIT__Description__c;
+            $inv->inv_unit           = $inv_r->fields->Indiv_Unit_of_Measurement_Description__c;
+            $inv->loc_name           = $loc->fields->Name;
+            $inv->loc_id             = $loc->fields->Id;
 
             $array_inv_each = array();
-            $inv_each = (object)[
-                'quant'     => floatval($loi->fields->TrackIT__Quantity__c),
-                'restock'   => floatval($loi->fields->Restock_Point__c),
-                'opt'       => floatval($loi->fields->Optimal_Quantity__c),
-                'max'       => floatval($loi->fields->Max_Storage_Capacity__c),
-                'loc_id'    => $loc->fields->Id,
-                'loc_name'  => $loc->fields->Name
-            ];
-            array_push($array_inv_each, $inv_each);
-
         }else{
             //new record same inv
             //aggregate
-            $inv->loi_quant_all     += floatval($loi->fields->TrackIT__Quantity__c);
-            $inv->loi_restock_all   += floatval($loi->fields->Restock_Point__c);
-            $inv->loi_opt_all       += floatval($loi->fields->Optimal_Quantity__c);
-            $inv->loi_max_all       += floatval($loi->fields->Max_Storage_Capacity__c);
-
-            // add loi
-            $inv_each = (object)[
-                'quant'     => floatval($loi->fields->TrackIT__Quantity__c),
-                'restock'   => floatval($loi->fields->Restock_Point__c),
-                'opt'       => floatval($loi->fields->Optimal_Quantity__c),
-                'max'       => floatval($loi->fields->Max_Storage_Capacity__c),
-                'loc_id'    => $loc->fields->Id,
-                'loc_name'  => $loc->fields->Name
-            ];
-            array_push($array_inv_each, $inv_each);
+            $inv->loi_quant_all     += $loi->fields->TrackIT__Quantity__c;
+            $inv->loi_restock_all   += $loi->fields->Restock_Point__c;
+            $inv->loi_opt_all       += $loi->fields->Optimal_Quantity__c;
+            $inv->loi_max_all       += $loi->fields->Max_Storage_Capacity__c;
         }
+
+        $inv_each = (object)[
+            'quant'     => 0.0,
+            'restock'   => 0.0,
+            'opt'       => 0.0,
+            'max'       => 0.0,
+            'loc_id'    => '',
+            'loc_name'  => ''
+        ];
+        // add loi
+        $inv_each->quant     = $loi->fields->TrackIT__Quantity__c;
+        $inv_each->restock   = $loi->fields->Restock_Point__c;
+        $inv_each->opt       = $loi->fields->Optimal_Quantity__c;
+        $inv_each->max       = $loi->fields->Max_Storage_Capacity__c;
+        $inv_each->loc_id    = $loc->fields->Id;
+        $inv_each->loc_name  = $loc->fields->Name;
+        array_push($array_inv_each, $inv_each);
+        $flag_skip_first = false;
     }
 }
 
@@ -412,15 +438,21 @@ function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs
             echo "<tr><td>Restock Point: </td><td>" . $inv->loi_restock . "</td></tr>";
             echo "<tr><td>Optimal Quantity: </td><td>" . $inv->loi_opt . "</td></tr>";
             echo "<tr><td>Max Quantity: </td><td>" . $inv->loi_max . "</td></tr>";
+            bdump('opt: ' . $inv->loi_opt);
+            bdump('floatval opt: ' . floatval($inv->loi_opt));
+            bdump(gettype($inv->loi_opt));
+            bdump('q: ' . $inv->loi_quant);
+            bdump('floatval q: ' . floatval($inv->loi_quant));
+            bdump(gettype($inv->loi_quant));
             if($inv->loi_quant <= $inv->loi_restock){
-                echo "<tr style='border:1px solid red;'><td>NEEDS: </td><td>" . floatval($inv->loi_opt) - floatval($inv->loi_quant) . "</td></tr>";
+                echo "<tr style='border:1px solid red;'><td style='color:red; text-align:right;'>NEEDS: </td><td>" . ($inv->loi_opt - $inv->loi_quant) . "</td></tr>";
             }
         }else{
             echo "<tr><td>Unit: </td><td>" . $inv->inv_unit . "</td></tr>";
             foreach($array_inv_each as $each_loi){
                 echo "<tr style='border:1px solid black;'><td>" . $each_loi->loc_name . ":</td><td>" . $each_loi->quant . "</td></tr>";
                 if($each_loi->quant <= $each_loi->restock){
-                    echo "<tr style='border:1px solid red;'><td>" . $each_loi->loc_name . " NEEDS:</td><td>" . floatval($each_loi->opt) - floatval($each_loi->quant) . "</td></tr>";
+                    echo "<tr style='border:1px solid red;'><td style='color:red; text-align:right;'>" . $each_loi->loc_name . " NEEDS:</td><td>" . ($each_loi->opt - $each_loi->quant) . "</td></tr>";
                 }
                 
             }
