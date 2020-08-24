@@ -231,6 +231,33 @@ function move_inv($mySforceConnection, $inv_id, $move_to_loid, $quant, $move_fro
 /**
  * 
  */
+function restock_from($mySforceConnection, $inv_id, $loc_id){
+    $query = "SELECT Id, TrackIT__Location__r.Name, TrackIT__Location__r.Id, TrackIT__Quantity__c
+        FROM TrackIT__Inv_Location__c 
+        WHERE TrackIT__Inventory__r.Id = '" . $inv_id . "'
+        AND isDeleted = false
+        AND TrackIT__Location__r.Id != '" . $loc_id . "'
+        AND TrackIT__Quantity__c > 0
+    ";
+    bdump($query);
+    $response = $mySforceConnection->query($query);
+    foreach ($response as $record) {
+        $loi = new SObject($record);
+        $loc_r = new SObject($loi->fields->TrackIT__Location__r);
+        echo "<a href='#' 
+                class='btn_restockFrom blue_button'
+                data-inv_id='" . $inv_id . "'
+                data-max='" . $loi->fields->TrackIT__Quantity__c . "'
+                data-loid='" . $loi->Id . "'
+            >" . $loc_r->fields->Name . " ( " . $loi->fields->TrackIT__Quantity__c . " )
+            </a>
+        ";
+    }
+}
+
+/**
+ * 
+ */
 /* Query Inv by Location */
 function query_inv_by_location($mySforceConnection, $location_id){
 
@@ -438,12 +465,7 @@ function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs
             echo "<tr><td>Restock Point: </td><td>" . $inv->loi_restock . "</td></tr>";
             echo "<tr><td>Optimal Quantity: </td><td>" . $inv->loi_opt . "</td></tr>";
             echo "<tr><td>Max Quantity: </td><td>" . $inv->loi_max . "</td></tr>";
-            bdump('opt: ' . $inv->loi_opt);
-            bdump('floatval opt: ' . floatval($inv->loi_opt));
-            bdump(gettype($inv->loi_opt));
-            bdump('q: ' . $inv->loi_quant);
-            bdump('floatval q: ' . floatval($inv->loi_quant));
-            bdump(gettype($inv->loi_quant));
+
             if($inv->loi_quant <= $inv->loi_restock){
                 echo "<tr style='border:1px solid red;'><td style='color:red; text-align:right;'>NEEDS: </td><td>" . ($inv->loi_opt - $inv->loi_quant) . "</td></tr>";
             }
@@ -541,28 +563,21 @@ function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs
             <?php
             } // END allow quant change
 
-            if('all' != $location){ // BEGIN move inventory
+            if('all' != $location){ // BEGIN RESTOCK
             ?>
-                <!-- a href='#' 
-                    class='btn_moveinv blue_button hide_assign2location hide_changeDescription hide_moveinv' 
-                    data-id='<?php //echo $inv->inv_id; ?>' >
-                    Move Inventory Here
-                </!-->
-                <div class='frm_moveinv' data-id='<?php echo $inv->inv_id; ?>' style='display:none; border-bottom:1px solid black;'>
-                        
-                    <input type='text' 
-                        class='quant_moveinv input_text' 
-                        data-id='<?php echo $inv->inv_id; ?>'
-                        data-loid='<?php echo $inv->loi_id; ?>'
-                        data-curr='<?php echo $inv->loi_quant; ?>'
-                        placeholder='Quantity'
-                    />
-    
-                    <select class="select_moveinv input_select" data-id="<?php echo $inv->inv_id; ?>">
-                    </select>
+                <a href='#' 
+                    class='btn_restock blue_button hide_assign2location hide_changeDescription hide_moveinv' 
+                    data-id='<?php echo $inv->inv_id; ?>'
+                    data-loc_id='<?php echo $location; ?>'
+                >
+                    Restock
+                </a>
+                <div class='frm_restock' data-id='<?php echo $inv->inv_id; ?>' style='display:none; border-bottom:1px solid black;'>
+                    <p style='font-size:20px;'>Restock From (Max):</p>
+                    <div class='restockFrom' data-id='<?php echo $inv->inv_id; ?>'></div>
                 </div>              
             <?php
-            } // END move inv
+            } // END Restock
 
             if('all' == $location){ // BEGIN assign to a location
             ?>

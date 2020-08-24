@@ -3,6 +3,9 @@ require 'site-auth.php';
 require_once 'functions.php';
 
 switch($_POST['run']){
+    case "restock-from":
+        restock_from($mySforceConnection, $_POST['inv_id'], $_POST['loc_id']);
+    break;
     case "move-inv":
         move_inv($mySforceConnection, $_POST['inv_id'], $_POST['loid'], $_POST['quant'], $_POST['move_loid'], $_POST['from_quant'], $_POST['curr']);
     break;

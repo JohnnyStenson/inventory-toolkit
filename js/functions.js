@@ -113,7 +113,6 @@ $(document).ready(function(){
         e.preventDefault();
         $('#loading_overlay').css('display','block');
         var id = $(this).data('id');
-        var location = $(this).data('location');
         var descr = $('.changeDescription[data-id="' + id + '"]').val();
         
         $.ajax({
@@ -133,35 +132,33 @@ $(document).ready(function(){
     });
 
 
-    
-
-
     /**
      * 
      */
-    /* Move Inventory */
-    $('#display').delegate('.btn_moveinv', 'click', function(e) {
+    /* Restock */
+    $('#display').delegate('.btn_restock', 'click', function(e) {
         e.preventDefault();
         var inv_id = $(this).data('id');
+        var loc_id = $(this).data('loc_id');
 
         $('.hide_moveinv[data-id="' + inv_id + '"]').css('display', 'none');
+        $('.frm_restock[data-id="' + inv_id + '"]').css('display', 'block');
         $('#loading_overlay').css('display','block');
-
+        
         $.ajax({
             type: "POST",
             url: 'inv-controller.php',
             data: {
-                run: 'get-locations-with-inv',
+                run: 'restock-from',
                 inv_id: inv_id, 
+                loc_id: loc_id
             },
             success: function(response)
             {
-                $('.select_moveinv[data-id="' + inv_id + '"]').html(response);
-                $('.frm_moveinv[data-id="' + inv_id + '"]').css('display', 'block');
+                $('.restockFrom[data-id="' + inv_id + '"]').html(response);
                 $('#loading_overlay').css('display','none');
             }
         });
-
     });
     $('#display').delegate('.select_moveinv', 'change', function(e) {
         var inv_id = $(this).data('id');
