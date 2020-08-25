@@ -140,6 +140,7 @@ $(document).ready(function(){
         e.preventDefault();
         var inv_id = $(this).data('id');
         var loc_id = $(this).data('loc_id');
+        var this_loi_id = $(this).data('this_loi_id');
 
         $('.hide_moveinv[data-id="' + inv_id + '"]').css('display', 'none');
         $('.frm_restock[data-id="' + inv_id + '"]').css('display', 'block');
@@ -151,7 +152,8 @@ $(document).ready(function(){
             data: {
                 run: 'restock-from',
                 inv_id: inv_id, 
-                loc_id: loc_id
+                loc_id: loc_id,
+                this_loi_id: this_loi_id
             },
             success: function(response)
             {
@@ -160,51 +162,54 @@ $(document).ready(function(){
             }
         });
     });
-    $('#display').delegate('.select_moveinv', 'change', function(e) {
-        var inv_id = $(this).data('id');
-        var quant = parseInt($('.quant_moveinv[data-id="' + inv_id + '"]').val());
+    $('#display').delegate('.btn_restockFrom', 'click', function(e) {
+        e.preventDefault();
+        var inv_id          = $(this).data('inv_id');
+        var quant_max       = $(this).data('max');
+        var from_loid       = $(this).data('loid');
+        var to_loid         = $(this).data('to_loi_id');
+        var from_loc_name   = $(this).data('from_loc_name');
+
+        $('.p_restockFrom[data-id="' + inv_id + '"]').text("Restock # from " + from_loc_name + ". Max: " + quant_max);
         
-        var obj = $.parseJSON($(this).find('option:selected').val());
-        var from_quant = parseInt(obj.from_quant);
-        var move_loid = obj.move_loid;
-        var loid = $('.quant_moveinv[data-id="' + inv_id + '"]').data('loid');
-        var curr = parseInt($('.quant_moveinv[data-id="' + inv_id + '"]').data('curr'));
+        $('.restockFrom[data-id="' + inv_id + '"]').html('<input type="text" class="quant_restockFrom input_text" data-inv_id="' + inv_id + '" /><br /><a href="#" class="btn_quantRestock blue_button" data-inv_id="' + inv_id + '" data-quant_max="' + quant_max + '" data-from_loid="' + from_loid + '" data-to_loid="' + to_loid + '">Move</a>');
+    });
+    $('#display').delegate('.btn_quantRestock', 'click', function(e) {
+        e.preventDefault();
+        var inv_id          = $(this).data('inv_id');
+        var quant_max       = $(this).data('quant_max');
+        var from_loid       = $(this).data('from_loid');
+        var to_loid         = $(this).data('to_loid');
+        var quant_restock = $('.quant_restockFrom[data-inv_id="' + inv_id + '"]').val();
+        var curr_to_quant = $('.inv_curr_quant[data-id="' + inv_id + '"]').data('quant');
 
-        /*alert('inv_id: ' + inv_id);
-        alert('quant: ' + quant);
-        alert('move_loid: ' + move_loid);
-        alert('loid: ' + loid);
-        alert('from_quant: ' + from_quant);
-        alert('curr: ' + curr);*/
-
-        if(quant = 0 || quant > from_quant){
-            alert('Quantity must be greater than 0 and less than location moving from. Refreshing. Try again.');
-            location.reload();
+        if(quant_restock > quant_max){
+            alert('Max is: ' + quant_max);
             return;
         }
-
         $('#loading_overlay').css('display','block');
 
         $.ajax({
             type: "POST",
             url: 'inv-controller.php',
             data: {
-                run: 'move-inv',
+                run: 'move-restock',
                 inv_id: inv_id, 
-                quant: quant,
-                move_loid: move_loid,
-                loid: loid,
-                from_quant: from_quant,
-                curr: curr
+                from_loid: from_loid,
+                to_loid: to_loid,
+                quant_restock: quant_restock,
+                curr_to_quant: curr_to_quant,
+                curr_from_quant: quant_max
             },
             success: function(response)
             {
-                alert('Moved' + response);
+                alert('Moved');
                 display_records();
             }
         });
-    });
 
+        
+    });
 
     /* Change Quantity */
     $('#display').delegate('.btn_displaychangequants', 'click', function(e) {

@@ -231,24 +231,52 @@ function move_inv($mySforceConnection, $inv_id, $move_to_loid, $quant, $move_fro
 /**
  * 
  */
-function restock_from($mySforceConnection, $inv_id, $loc_id){
+function move_restock($mySforceConnection, $inv_id, $from_loid, $to_loid, $quant_restock, $curr_to_quant, $curr_from_quant){
+    $new_to_quant = $curr_to_quant + $quant_restock;
+    $new_from_quant = $curr_from_quant - $quant_restock;
+
+    $from_records[0] = new SObject();
+	$from_records[0]->Id = $from_loid;
+	$from_records[0]->fields = array(
+        'TrackIT__Quantity__c' => $new_from_quant
+	);
+	$from_records[0]->type = 'TrackIT__Inv_Location__c';
+
+    $from_response = $mySforceConnection->update($from_records);
+    
+    $to_records[0] = new SObject();
+	$to_records[0]->Id = $to_loid;
+	$to_records[0]->fields = array(
+        'TrackIT__Quantity__c' => $new_to_quant
+	);
+	$to_records[0]->type = 'TrackIT__Inv_Location__c';
+
+	$to_response = $mySforceConnection->update($to_records);
+}
+
+
+/**
+ * 
+ */
+function restock_from($mySforceConnection, $inv_id, $loc_id, $this_loi_id){
     $query = "SELECT Id, TrackIT__Location__r.Name, TrackIT__Location__r.Id, TrackIT__Quantity__c
         FROM TrackIT__Inv_Location__c 
         WHERE TrackIT__Inventory__r.Id = '" . $inv_id . "'
-        AND isDeleted = false
         AND TrackIT__Location__r.Id != '" . $loc_id . "'
         AND TrackIT__Quantity__c > 0
+        AND isDeleted = false
     ";
-    bdump($query);
     $response = $mySforceConnection->query($query);
     foreach ($response as $record) {
         $loi = new SObject($record);
         $loc_r = new SObject($loi->fields->TrackIT__Location__r);
         echo "<a href='#' 
-                class='btn_restockFrom blue_button'
+                class='btn_restockFrom blue_button hide_restockFrom'
                 data-inv_id='" . $inv_id . "'
                 data-max='" . $loi->fields->TrackIT__Quantity__c . "'
                 data-loid='" . $loi->Id . "'
+                data-to_loi_id='" . $this_loi_id . "'
+                data-from_loc_name='" . $loc_r->fields->Name . "'
             >" . $loc_r->fields->Name . " ( " . $loi->fields->TrackIT__Quantity__c . " )
             </a>
         ";
@@ -428,6 +456,7 @@ function loop_inventory($mySforceConnection, $response, $location){
 
 
 function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs){
+    bdump($inv);
     if(isset($_SESSION['fulfillment']) && $_SESSION['fulfillment']){
         $filter_fulfillment = 0;
         foreach($array_inv_each as $loinv){
@@ -461,7 +490,7 @@ function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs
         echo "<div class='inv_quantity'><table class='table_quants'>";
         if('all' != $location){
             echo "<tr><td>Unit: </td><td>" . $inv->inv_unit . "</td></tr>";
-            echo "<tr style='border:1px solid black;'><td>Current Quantity: </td><td>" . $inv->loi_quant . "</td></tr>";
+            echo "<tr style='border:1px solid black;'><td>Current Quantity: </td><td class='inv_curr_quant' data-id='" . $inv->inv_id . "' data-quant='" . $inv->loi_quant . "'>" . $inv->loi_quant . "</td></tr>";
             echo "<tr><td>Restock Point: </td><td>" . $inv->loi_restock . "</td></tr>";
             echo "<tr><td>Optimal Quantity: </td><td>" . $inv->loi_opt . "</td></tr>";
             echo "<tr><td>Max Quantity: </td><td>" . $inv->loi_max . "</td></tr>";
@@ -569,11 +598,12 @@ function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs
                     class='btn_restock blue_button hide_assign2location hide_changeDescription hide_moveinv' 
                     data-id='<?php echo $inv->inv_id; ?>'
                     data-loc_id='<?php echo $location; ?>'
+                    data-this_loi_id='<?php echo $inv->loi_id; ?>'
                 >
                     Restock
                 </a>
                 <div class='frm_restock' data-id='<?php echo $inv->inv_id; ?>' style='display:none; border-bottom:1px solid black;'>
-                    <p style='font-size:20px;'>Restock From (Max):</p>
+                    <p style='font-size:20px;' class='p_restockFrom' data-id='<?php echo $inv->inv_id; ?>'>Restock From (Max):</p>
                     <div class='restockFrom' data-id='<?php echo $inv->inv_id; ?>'></div>
                 </div>              
             <?php
