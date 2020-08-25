@@ -9,10 +9,10 @@ require 'config.php';?>
     <meta name="description" content="Inventory">
     <meta name="author" content="Johnny Stenson">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" media="screen" href="style.css?v=1.0">
+    <link rel="stylesheet" media="screen" href="style.css?v=2.0">
     <link rel="stylesheet" media="print" href="print.css?v=1.0">
     <script src="js/jquery-3.4.1.min.js"></script>
-    <script src="js/functions.js"></script>
+    <script src="js/functions.js?v=2.0"></script>
 </head>
 
 <body>
