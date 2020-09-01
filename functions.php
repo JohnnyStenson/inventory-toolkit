@@ -35,7 +35,7 @@ function get_location_list($mySforceConnection){
 
 
 function get_job_list($mySforceConnection){
-    $query = "SELECT Id, Name from Job__c ORDER BY Name ASC";
+    $query = "SELECT Id, Name from Job__c WHERE Job_Status__c = 'Active' ORDER BY Name ASC";
     $response = $mySforceConnection->query($query);
     $arrayJobs = [];
     foreach ($response as $record) {
