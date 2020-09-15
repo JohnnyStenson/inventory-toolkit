@@ -12,6 +12,7 @@ if(rememberMeCookie($pdo)){
 }else{
     ?>
     <form method='post' action='#' style='text-align:center;' id='frmLogin'>
+        <h2 style='text-align:center;'>Inventory</h2>
         <input type='text' id='un' name='un' style='font-size:20px; padding:20px; margin:30px 0px; width:80%;' placeholder='Name/Nome'/>
         <input type='password' id='pw' name='pw' style='font-size:20px; padding:20px; margin:30px 0px; width:80%;' placeholder='Password/Senha' />
         
