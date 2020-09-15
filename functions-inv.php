@@ -162,7 +162,7 @@ function nonassigned_inv_locations($mySforceConnection, $inv_id){
             echo "<option value='$id'>$name</option>";
         }
     }
-    return $options;
+    //return $options;
 }
 
 
