@@ -170,7 +170,7 @@ $(document).ready(function(){
         var to_loid         = $(this).data('to_loi_id');
         var from_loc_name   = $(this).data('from_loc_name');
 
-        $('.p_restockFrom[data-id="' + inv_id + '"]').text("Restock # from " + from_loc_name + ". Max: " + quant_max);
+        $('.p_restockFrom[data-id="' + inv_id + '"]').text("Restock # from " + from_loc_name + ". Current Quantity(Max Restock): " + quant_max);
         
         $('.restockFrom[data-id="' + inv_id + '"]').html('<input type="text" class="quant_restockFrom input_text" data-inv_id="' + inv_id + '" /><br /><a href="#" class="btn_quantRestock blue_button" data-inv_id="' + inv_id + '" data-quant_max="' + quant_max + '" data-from_loid="' + from_loid + '" data-to_loid="' + to_loid + '">Move</a>');
     });
