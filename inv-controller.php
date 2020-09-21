@@ -3,6 +3,10 @@ require 'site-auth.php';
 require_once 'functions.php';
 
 switch($_POST['run']){
+    case "get-location-JSON":
+        header('Content-Type: application/json');
+        echo get_location_list_JSON($mySforceConnection);
+    break;
     case "move-restock":
         move_restock($mySforceConnection, $_POST['inv_id'], $_POST['from_loid'], $_POST['to_loid'], $_POST['quant_restock'], $_POST['curr_to_quant'], $_POST['curr_from_quant']);
     break;
@@ -10,10 +14,10 @@ switch($_POST['run']){
         restock_from($mySforceConnection, $_POST['inv_id'], $_POST['loc_id'], $_POST['this_loi_id']);
     break;
     case "move-inv":
-        move_inv($mySforceConnection, $_POST['inv_id'], $_POST['loid'], $_POST['quant'], $_POST['move_loid'], $_POST['from_quant'], $_POST['curr']);
+        move_inv($mySforceConnection, $_POST['inv_id'], $_POST['quant'], $_POST['orig_loc_id'], $_POST['orig_quant'], $_POST['new_loc_id'], $_POST['to_quant']);
     break;
-    case "get-locations-with-inv":
-        get_locations_with_inv($mySforceConnection, $_POST['inv_id'], $_SESSION['location_id']);
+    case "get-locations-assigned-inv":
+        get_locations_assigned_inv($mySforceConnection, $_POST['inv_id'], $_SESSION['location_id']);
     break;
     case "nonassigned-inv-locations":
         nonassigned_inv_locations($mySforceConnection, $_POST['inv_id']);

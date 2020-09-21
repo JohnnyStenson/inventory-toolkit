@@ -289,18 +289,59 @@ $(document).ready(function(){
 
 
     /* Move Item */
-    $('#display').delegate('.moveItemLocation', 'change', function(e) {
-
+    $('#display').delegate('.btn_moveinv', 'click', function(e) {
+        e.preventDefault();
         var id = $(this).data('id');
-        var locId = $(this).val();
+        //var this_loc_id = $(this).data('loc_id');
+        $('#loading_overlay').css('display','block');
+        $('.hide_invmove').css('display','none');
+        $('.frm_moveinv[data-id="' + id + '"]').css('display','block');
+        
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'get-locations-assigned-inv',
+                inv_id: id
+            },
+            success: function(response)
+            {
+                /*var options = '';
+                $.each(response, function(index, location) {
+                    if(index != id){
+                        options += "<option value='" + index + "'>" + location + "</option>";
+                    }
+                });
+                $('.location_moveinv[data-id="' + id + '"]').append(options);*/
+                $('.location_moveinv[data-id="' + id + '"]').html(response);
+                $('#loading_overlay').css('display','none');
+            }
+        });
+    });
+
+    $('#display').delegate('.location_moveinv', 'change', function(e) {
+
+        var inv_id = $(this).data('id');
+        var quant =0.0;
+        quant = $('.quant_moveinv[data-id="' + inv_id + '"]').val();
+        var orig_loc_id = $(this).data('orig_loc_id');
+        var orig_quant = 0.0;
+        orig_quant = $(this).data('orig_quant');
+        var new_loc_id = $(this).val();
+        var to_quant = 0.0;
+        to_quant = $(this).find(':selected').data('quant');
         $('#loading_overlay').css('display','block');
         $.ajax({
             type: "POST",
             url: 'inv-controller.php',
             data: {
-                run: 'move-item',
-                id: id, 
-                new_loc_id: locId
+                run: 'move-inv',
+                inv_id: inv_id,
+                quant: quant,
+                orig_loc_id: orig_loc_id,
+                orig_quant: orig_quant,
+                new_loc_id: new_loc_id,
+                to_quant: to_quant
             },
             success: function(response)
             {

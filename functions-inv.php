@@ -169,22 +169,24 @@ function nonassigned_inv_locations($mySforceConnection, $inv_id){
 /**
  * 
  */
-function get_locations_with_inv($mySforceConnection, $inv_id, $location_id){
-    $query = "SELECT Id, TrackIT__Location__r.Name, TrackIT__Location__r.Id, TrackIT__Quantity__c
+function get_locations_assigned_inv($mySforceConnection, $inv_id, $location_id){
+    $query = "SELECT Id, Name, TrackIT__Location__r.Name, TrackIT__Location__r.Id, TrackIT__Quantity__c
         FROM TrackIT__Inv_Location__c 
         WHERE TrackIT__Inventory__r.Id = '" . $inv_id . "'
         AND isDeleted = false
         AND TrackIT__Location__r.Id != '" . $location_id . "'
     ";
     $response = $mySforceConnection->query($query);
-    echo "<option value='0'>Move From:</option>";
+
+    echo "<option value='0'>Choose Location to Move To:</option>";
     foreach ($response as $record) {
-        $sObject = new SObject($record);
-        $sObject2 = new SObject($sObject->fields->TrackIT__Location__r);
-        if($sObject->fields->TrackIT__Quantity__c > 0){
+
+        $loi = new SObject($record);
+        $location_r = new SObject($loi->fields->TrackIT__Location__r);
+        if($location_id != $location_r->Id){
         ?>
-            <option value='{"move_loid":"<?php echo $sObject->Id; ?>","from_quant":"<?php echo $sObject->fields->TrackIT__Quantity__c; ?>"}'>
-                <?php echo $sObject2->fields->Name . "( " . $sObject->fields->TrackIT__Quantity__c . " )"; ?>
+            <option value='<?php echo $loi->Id; ?>' data-quant='<?php echo $loi->fields->TrackIT__Quantity__c; ?>'>
+                <?php echo $location_r->fields->Name; ?>
             </option>
         <?php 
         }
@@ -195,36 +197,30 @@ function get_locations_with_inv($mySforceConnection, $inv_id, $location_id){
 /**
  * 
  */
-function move_inv($mySforceConnection, $inv_id, $move_to_loid, $quant, $move_from_loid, $from_quant, $curr){
-
-    $quant = floatval($quant);
-    $from_quant = floatval($from_quant);
-    $curr = floatval($curr);
-
-    $newFromQuant = $from_quant - $quant;
-    $newToQuant = $curr + $quant;
-
-    // update from loi update to loi
-    $records[0] = new SObject();
-	$records[0]->Id = $move_from_loid;
-	$records[0]->fields = array(
-        'TrackIT__Quantity__c' => $newFromQuant
-	);
-	$records[0]->type = 'TrackIT__Inv_Location__c';
-
-    /*$records[1] = new SObject();
-	$records[1]->Id = $move_to_loid;
-	$records[1]->fields = array(
-        'TrackIT__Quantity__c' => $newToQuant
-	);
-    $records[1]->type = 'TrackIT__Inv_Location__c';*/
+function move_inv($mySforceConnection, $inv_id, $quant, $orig_loc_id, $orig_quant, $new_loc_id, $to_quant){
     
-    $response = $mySforceConnection->update($records);
-    print_r($response);
-    foreach ($response as $result) {
-        echo "\n" . $result->id . " updated\n";
-    }
-        
+    $new_to_quant = $to_quant + $quant;
+    $new_from_quant = $orig_quant - $quant;
+bdump($new_to_quant."|".$new_from_quant."|".$orig_loc_id."|".$new_loc_id);
+
+    $from_records[0] = new SObject();
+	$from_records[0]->Id = $orig_loc_id;
+	$from_records[0]->fields = array(
+        'TrackIT__Quantity__c' => $new_from_quant
+	);
+	$from_records[0]->type = 'TrackIT__Inv_Location__c';
+
+    $from_response = $mySforceConnection->update($from_records);
+    
+    $to_records[0] = new SObject();
+	$to_records[0]->Id = $new_loc_id;
+	$to_records[0]->fields = array(
+        'TrackIT__Quantity__c' => $new_to_quant
+	);
+	$to_records[0]->type = 'TrackIT__Inv_Location__c';
+
+	$to_response = $mySforceConnection->update($to_records);
+    
 }
 
 
@@ -591,6 +587,28 @@ function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs
                 </div>
             <?php
             } // END allow quant change
+
+            if('all' != $location){ // BEGIN move-inv
+                ?>
+                <a href='#' 
+                    class='btn_moveinv blue_button hide_assign2location hide_changeDescription hide_changequants hide_moveinv' 
+                    data-id='<?php echo $inv->inv_id; ?>'
+                    data-loc_id='<?php echo $location; ?>'
+                >
+                    Move # from This Location
+                </a>
+                <div class='frm_moveinv hide_assign2location hide_changeDescription hide_changequants hide_moveinv' data-id='<?php echo $inv->inv_id; ?>' style='display:none; border-bottom:1px solid black;'>
+                    <input type='number' 
+                        class='quant_moveinv input_text' 
+                        data-id='<?php echo $inv->inv_id; ?>' 
+                        placeholder='Max <?php echo $inv->loi_quant; ?>'
+                    />
+                    <select class="location_moveinv input_select" data-id="<?php echo $inv->inv_id; ?>" data-orig_quant="<?php echo $inv->loi_quant; ?>" data-orig_loc_id="<?php echo $inv->loi_id; ?>">
+                        <option value='0'>Choose Location to Move to...</option>
+                    </select>
+                </div>
+                    <?php
+            } // END allow move-inv
 
             if('all' != $location){ // BEGIN RESTOCK
             ?>
