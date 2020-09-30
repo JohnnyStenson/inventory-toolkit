@@ -324,12 +324,25 @@ $(document).ready(function(){
         var inv_id = $(this).data('id');
         var quant =0.0;
         quant = $('.quant_moveinv[data-id="' + inv_id + '"]').val();
+        if(isNaN(quant)){
+            alert('Quantity needs to be a number.');
+            return;
+        }
+        
         var orig_loc_id = $(this).data('orig_loc_id');
         var orig_quant = 0.0;
         orig_quant = $(this).data('orig_quant');
+        if(isNaN(orig_quant)){
+            orig_quant = 0.0;
+        }
+
         var new_loc_id = $(this).val();
         var to_quant = 0.0;
         to_quant = $(this).find(':selected').data('quant');
+        if(isNaN(to_quant)){
+            to_quant = 0.0;
+        }
+
         $('#loading_overlay').css('display','block');
         $.ajax({
             type: "POST",
