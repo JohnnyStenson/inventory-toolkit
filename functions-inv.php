@@ -280,7 +280,7 @@ function restock_from($mySforceConnection, $inv_id, $loc_id, $this_loi_id){
 }
 
 /**
- * 
+ * MAIN QUERY FOR DISPLAY
  */
 /* Query Inv by Location */
 function query_inv_by_location($mySforceConnection, $location_id){
@@ -289,15 +289,8 @@ function query_inv_by_location($mySforceConnection, $location_id){
             FROM TrackIT__Inv_Location__c 
             WHERE isDeleted = false";
 
-    if($location_id == 'all'){
-        /* DEPRECATED Query All Inventory__c */
-        /*$query = "SELECT Name, Id, Image_for_ListView__c, TrackIT__Description__c, TrackIT__Total_Quantity__c, Indiv_Unit_of_Measurement_Description__c
-            FROM TrackIT__Inventory__c 
-            WHERE isDeleted = false";*/
-
-        $query .= " ORDER BY TrackIT__Inventory__r.Id";
-    }else{
-        $query .= " AND TrackIT__Location__c = '" . $location_id . "'";
+    if($location_id != 'all'){
+        $query .= " AND TrackIT__Location__c = '" . $location_id . "'  ORDER BY TrackIT__Inventory__r.Name ASC";
     }
     
     $response = $mySforceConnection->query($query);
