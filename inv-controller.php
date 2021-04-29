@@ -53,11 +53,6 @@ switch($_POST['run']){
             main_query($mySforceConnection, $_SESSION['location_id'], $_SESSION['inv_item']);
         }
     break;
-    case "display-inv":
-        if(isset($_SESSION['location_id'])){
-            main_query($mySforceConnection, $_SESSION['location_id'], $_SESSION['inv_item']);
-        }
-    break;
     case "toggle-fulfillment":
         $_SESSION['fulfillment'] = filter_var($_POST['fulfillment'], FILTER_SANITIZE_STRING);
     break;
