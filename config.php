@@ -76,3 +76,26 @@ try {
      throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
 
+/** 
+ * Global Debug Log Function
+ * 
+ * 
+ */
+
+ function jjsDebug($error_info_array){
+    $debugf = "jjsDebugLog.txt";
+    $filehandle = fopen($debugf, 'a+');
+    
+    if(is_array($error_info_array)){
+        foreach($error_info_array as $fdata) {
+            $fdata += "\n";
+            fwrite($filehandle, $fdata);
+        }
+    }else{
+        $fdata = $error_info_array . "\n";
+        fwrite($filehandle, $fdata);
+    }
+    
+    
+    fclose($filehandle);
+ }

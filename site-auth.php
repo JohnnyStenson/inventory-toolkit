@@ -25,6 +25,7 @@ if(rememberMeCookie($pdo)){
 function rememberMeCookie($pdo){
     $cookie = isset($_COOKIE['rememberme']) ? $_COOKIE['rememberme'] : '';
     if ($cookie) {
+        //jjsDebug($cookie);
         list ($user, $token, $mac) = explode(':', $cookie);
         if (!hash_equals(hash_hmac('sha256', $user . ':' . $token, SITE_KEY), $mac)) {
             return false;
