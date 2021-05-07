@@ -15,6 +15,7 @@ switch($sSubDomain){
     break;
     case 'lightning':
         Debugger::enable(Debugger::PRODUCTION,__DIR__);
+        Debugger::$showBar = true;
     break;
 }
 
