@@ -43,18 +43,33 @@ function change_quantity_location_of_inventory($mySforceConnection, $inv_id, $lo
  *
  */
 function deduct_inv_from_location($mySforceConnection, $inv_id, $location_id, $job_id, $quant){
-    $records = array();
+    if($job_id <> 0){
+        $records = array();
 
-    $records[0] = new SObject();
-	$records[0]->fields = array(
-        'Inventory__c' => $inv_id,
-        'Location__c' => $location_id,
-        'Job__c' => $job_id,
-        'Quantity_Used__c' => $quant
-    );
-    $records[0]->type = 'Job_Inventory_Consumption__c';
+        $records[0] = new SObject();
+        $records[0]->fields = array(
+            'Inventory__c' => $inv_id,
+            'Location__c' => $location_id,
+            'Project__c' => $job_id,
+            'Quantity_Used__c' => $quant
+        );
+        $records[0]->type = 'Job_Inventory_Consumption__c';
 
-    $response = $mySforceConnection->create($records);
+        $response = $mySforceConnection->create($records);
+    }else{
+        $records = array();
+
+        $records[0] = new SObject();
+        $records[0]->fields = array(
+            'Inventory__c' => $inv_id,
+            'Location__c' => $location_id,
+            'Quantity_Used__c' => $quant
+        );
+        $records[0]->type = 'Job_Inventory_Consumption__c';
+
+        $response = $mySforceConnection->create($records);
+    }
+    
 
 }
 

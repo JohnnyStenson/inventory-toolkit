@@ -23,7 +23,7 @@ function show_all_locations($mySforceConnection){
 
 
 function get_location_list($mySforceConnection){
-    $query = "SELECT Id, Name from TrackIT__Location__c ORDER BY Name DESC";
+    $query = "SELECT Id, Name from TrackIT__Location__c WHERE Active__c = True ORDER BY Name DESC";
     $response = $mySforceConnection->query($query);
     $arrayLocations = [];
     foreach ($response as $record) {
@@ -35,13 +35,14 @@ function get_location_list($mySforceConnection){
 
 
 function get_job_list($mySforceConnection){
-    $query = "SELECT Id, Name from Job__c WHERE Job_Status__c = 'Active' ORDER BY Name ASC";
+    $query = "SELECT Id, Name from Krow__Project__c WHERE Krow__Project_Template__c = FALSE AND Krow__Task_Template__c = FALSE AND Krow__Archived__c = FALSE AND (Krow__Project_Status__c = 'Unscheduled Job' OR Krow__Project_Status__c = 'Job') ORDER BY Name ASC";
     $response = $mySforceConnection->query($query);
     $arrayJobs = [];
     foreach ($response as $record) {
         $sObject = new SObject($record);
         $arrayJobs[$sObject->Id] = $sObject->fields->Name;
     }
+    $arrayJobs[0] = "Not a Job";
     return $arrayJobs;
 }
 
