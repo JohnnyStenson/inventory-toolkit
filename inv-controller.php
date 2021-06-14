@@ -59,6 +59,9 @@ switch($_POST['run']){
     case "use-inv":
         deduct_inv_from_location($mySforceConnection, $_POST['id'], $_SESSION['location_id'], $_POST['jobId'], $_POST['quant']);
     break;
+    case "leave-inv":
+        leave_inv_at_job($mySforceConnection, $_POST['id'], $_SESSION['location_id'], $_POST['jobId'], $_POST['quant']);
+    break;
     case "move-item":
         update_item_location($mySforceConnection, $_POST['id'], $_POST['new_loc_id']);
     break;

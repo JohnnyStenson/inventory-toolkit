@@ -156,12 +156,16 @@ input[type='text']{
     display:block;
     margin:20px auto; 
 }
-.lbl_consumeJob{
+.lbl_consumeJob,.lbl_leaveJob{
     font-size:20px; 
     padding:10px; 
 }
 .consumeJob{
     display:none;
+    margin: 20px auto;
+    padding:20px;
+}
+.leaveJob{
     margin: 20px auto;
     padding:20px;
 }

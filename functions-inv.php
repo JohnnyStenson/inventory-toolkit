@@ -75,6 +75,26 @@ function deduct_inv_from_location($mySforceConnection, $inv_id, $location_id, $j
 
 
 /**
+ *
+ */
+function leave_inv_at_job($mySforceConnection, $inv_id, $location_id, $job_id, $quant){
+
+    $records = array();
+
+    $records[0] = new SObject();
+    $records[0]->fields = array(
+        'Inventory__c' => $inv_id,
+        'From_Location__c' => $location_id,
+        'Job__c' => $job_id,
+        'Quantity__c' => $quant
+    );
+    $records[0]->type = 'Inventory_Left_on_Job__c';
+
+    $response = $mySforceConnection->create($records);
+}
+
+
+/**
  * 
  */
 function keep_inv_location($mySforceConnection, $loi_id){
@@ -515,7 +535,8 @@ function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs
         echo "</table></div>";
 
         if('all' != $location){
-            echo "<div class='inv_use hide_drawer hide_changequants' data-id='" . $inv->inv_id . "'>
+            echo "
+            <div class='inv_use hide_drawer hide_changequants hide_leaveonjob' data-id='" . $inv->inv_id . "'>
                 <div class='used' data-id='" . $inv->inv_id . "'>
                     <input type='text' class='consumeQuant' data-id='" . $inv->inv_id . "' placeholder='# USED'/>
                     
@@ -524,6 +545,19 @@ function display_inv_record($inv, $array_inv_each, $location, $ploJobs, $ploLocs
                     $ploJobs .
                     "</select>
                 </div>
+            </div>";
+
+            echo "
+            <a href='#' class='btn_leaveonjob blue_button hide_leaveonjob hide_changequants' data-id='" . $inv->inv_id . "'>Temporarily Leave # on Job</a>
+            <div class='inv_leave hide_drawer hide_changequants' data-id='" . $inv->inv_id . "' style='display:none;'>
+                <input type='text' class='leaveQuant input_text' data-id='" . $inv->inv_id . "' placeholder='# LEFT'/>
+                
+                <label class='lbl_leaveJob' data-id='" . $inv->inv_id . "' >Select Job:</label>
+
+                <select class='leaveJob' data-id='" . $inv->inv_id . "' ><option value='0'>Choose:</option>" .
+                $ploJobs .
+                "</select>
+                <a href='#' class='btn_submit_leaveonjob blue_button hide_leaveonjob hide_changequants' data-id='" . $inv->inv_id . "' data-location='" . $location . "' data-current='" . $inv->loi_quant . "'>Submit</a>
             </div>";
         }
 

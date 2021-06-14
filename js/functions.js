@@ -254,6 +254,7 @@ $(document).ready(function(){
         var id = $(this).data('id');
         $('.consumeJob[data-id="' + id + '"]').css('display', 'block');
         $('.lbl_consumeJob[data-id="' + id + '"]').css('display', 'block');
+        $('.btn_leaveonjob[data-id="' + id + '"]').css('display', 'none');
 
     });
     $('#display').delegate('.consumeJob', 'change', function(e) {
@@ -282,6 +283,52 @@ $(document).ready(function(){
             success: function(response)
             {
                 alert('Deducted');
+                display_records();
+            }
+        });
+    });
+
+
+    /* Leave Inventory on Job */
+    $('#display').delegate('.btn_leaveonjob', 'click', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        $('.inv_use[data-id="' + id + '"]').css('display', 'none');
+        $('.inv_leave[data-id="' + id + '"]').css('display', 'block');
+        $('.btn_leaveonjob[data-id="' + id + '"]').css('display', 'none');
+
+    });
+    $('#display').delegate('.btn_submit_leaveonjob', 'click', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var location = $(this).data('location');
+        var quant = parseInt($('.leaveQuant[data-id="' + id + '"]').val());
+        var current = parseInt($(this).data('current'));
+        var jobId = $('.leaveJob[data-id="' + id + '"]').val();
+        $('.inv_leave[data-id="' + id + '"]').css('display', 'none');
+
+        if(quant > current || 0 == quant || '' == quant){
+            alert('Deducting too many or none. Refresh page and try again. / Deduzindo muitos ou nenhum. Atualize a página e tente novamente.');
+            return;
+        }
+        if(0 == jobId){
+            alert('No Job Chosen. Refresh page and try again. / Nenhum trabalho escolhido. Atualize a página e tente novamente.');
+            return;
+        }
+        $('#loading_overlay').css('display','block');
+        $.ajax({
+            type: "POST",
+            url: 'inv-controller.php',
+            data: {
+                run: 'leave-inv',
+                id: id, 
+                location: location,
+                jobId: jobId,
+                quant: quant
+            },
+            success: function(response)
+            {
+                alert('Left on Job');
                 display_records();
             }
         });
